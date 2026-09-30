@@ -332,7 +332,7 @@
     // Custom Chart.js plugin to draw a fluorescent yellow background behind N150 row and label
     const highlightRefPlugin = {
       id: "highlightRefPlugin",
-      beforeDatasetsDraw(chartInstance) {
+      beforeDraw(chartInstance) {
         const yScale = chartInstance.scales.y;
         const xScale = chartInstance.scales.x;
         const currentLabels = chartInstance.data.labels;
@@ -477,13 +477,13 @@
                   color: function(context) {
                     const currentLabels = context.chart ? context.chart.data.labels : labels;
                     const label = currentLabels ? currentLabels[context.index] : null;
-                    return isRefLabel(label) ? "#854d0e" : "#334155";
+                    return isRefLabel(label) ? "#0f172a" : "#334155";
                   },
                   font: function(context) {
                     const currentLabels = context.chart ? context.chart.data.labels : labels;
                     const label = currentLabels ? currentLabels[context.index] : null;
                     if (isRefLabel(label)) {
-                      return { weight: "bold", size: 12 };
+                      return { weight: "bold", size: 12.5 };
                     }
                     return { weight: "normal", size: 12 };
                   }
