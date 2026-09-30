@@ -283,10 +283,40 @@
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .sel-btn:hover {
       background: #e2e8f0;
       color: #0f172a;
+    }
+    .sel-btn.active-w11 {
+      background: #16a34a;
+      border-color: #15803d;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(22, 163, 74, 0.3);
+    }
+    .sel-btn.active-w11:hover {
+      background: #15803d;
+    }
+    .sel-btn.active-ddr4 {
+      background: #2563eb;
+      border-color: #1d4ed8;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.3);
+    }
+    .sel-btn.active-ddr4:hover {
+      background: #1d4ed8;
+    }
+    .sel-btn.active-ddr5 {
+      background: #7c3aed;
+      border-color: #6d28d9;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(124, 58, 237, 0.3);
+    }
+    .sel-btn.active-ddr5:hover {
+      background: #6d28d9;
     }
     .selection-counter {
       font-size: 0.82rem;
@@ -418,9 +448,9 @@
       <span class="selection-bar-title">Selection:</span>
       <button type="button" class="sel-btn" onclick="selectAllCpus()">Select All</button>
       <button type="button" class="sel-btn" onclick="deselectAllCpus()">Deselect All (Keep Ref)</button>
-      <button type="button" class="sel-btn" onclick="selectByFilter('w11')">✓ W11 only</button>
-      <button type="button" class="sel-btn" onclick="selectByFilter('ddr5')" title="Select all CPUs supporting DDR5 (including hybrid DDR4/DDR5)">DDR5</button>
-      <button type="button" class="sel-btn" onclick="selectByFilter('ddr4')" title="Select all CPUs supporting DDR4 (including hybrid DDR4/DDR5)">DDR4</button>
+      <button type="button" class="sel-btn" id="btnSelW11" onclick="toggleSelectionFilter('w11')" title="Toggle Windows 11 filter (can be combined with RAM filters)">✓ W11 only</button>
+      <button type="button" class="sel-btn" id="btnSelDdr4" onclick="toggleSelectionFilter('ddr4')" title="Toggle DDR4 filter (can be combined with W11 only)">DDR4</button>
+      <button type="button" class="sel-btn" id="btnSelDdr5" onclick="toggleSelectionFilter('ddr5')" title="Toggle DDR5 filter (can be combined with W11 only)">DDR5</button>
       <span class="selection-counter" id="selectionCounter"></span>
     </div>
     <div class="selection-bar-right">
@@ -546,28 +576,80 @@
       updateChart();
     }
 
+    // Active selection filter toggle states
+    let selFilterW11 = false;
+    let selFilterDdr4 = false;
+    let selFilterDdr5 = false;
+
     function selectAllCpus() {
-      cpuData.forEach(c => checkedCpuNames.add(c.name));
+      selFilterW11 = false;
+      selFilterDdr4 = false;
+      selFilterDdr5 = false;
+      updateSelectionFilterButtons();
+      checkedCpuNames = new Set(cpuData.map(c => c.name));
+      viewOnlyChecked = false;
       updateChart();
     }
 
     function deselectAllCpus() {
+      selFilterW11 = false;
+      selFilterDdr4 = false;
+      selFilterDdr5 = false;
+      updateSelectionFilterButtons();
       checkedCpuNames = new Set([currentRefName]);
       viewOnlyChecked = false;
       updateChart();
     }
 
-    function selectByFilter(type) {
-      checkedCpuNames = new Set([currentRefName]);
-      cpuData.forEach(cpu => {
-        if (type === "w11" && cpu.win11) {
+    function toggleSelectionFilter(type) {
+      if (type === "w11") selFilterW11 = !selFilterW11;
+      if (type === "ddr4") selFilterDdr4 = !selFilterDdr4;
+      if (type === "ddr5") selFilterDdr5 = !selFilterDdr5;
+
+      updateSelectionFilterButtons();
+      applySelectionFilters();
+    }
+
+    function updateSelectionFilterButtons() {
+      const btnW11 = document.getElementById("btnSelW11");
+      const btnDdr4 = document.getElementById("btnSelDdr4");
+      const btnDdr5 = document.getElementById("btnSelDdr5");
+
+      if (btnW11) {
+        btnW11.classList.toggle("active-w11", selFilterW11);
+      }
+      if (btnDdr4) {
+        btnDdr4.classList.toggle("active-ddr4", selFilterDdr4);
+      }
+      if (btnDdr5) {
+        btnDdr5.classList.toggle("active-ddr5", selFilterDdr5);
+      }
+    }
+
+    function applySelectionFilters() {
+      // If no filter is toggled, restore all CPUs
+      if (!selFilterW11 && !selFilterDdr4 && !selFilterDdr5) {
+        checkedCpuNames = new Set(cpuData.map(c => c.name));
+      } else {
+        checkedCpuNames = new Set([currentRefName]);
+        cpuData.forEach(cpu => {
+          // If W11 filter is active, require win11 support
+          if (selFilterW11 && !cpu.win11) return;
+
+          // If either DDR4 or DDR5 filter is active, require matching RAM support
+          if (selFilterDdr4 || selFilterDdr5) {
+            const hasDdr4 = cpu.ram && cpu.ram.includes("DDR4");
+            const hasDdr5 = cpu.ram && cpu.ram.includes("DDR5");
+            let ramMatch = false;
+            if (selFilterDdr4 && hasDdr4) ramMatch = true;
+            if (selFilterDdr5 && hasDdr5) ramMatch = true;
+            if (!ramMatch) return;
+          }
+
           checkedCpuNames.add(cpu.name);
-        } else if (type === "ddr5" && cpu.ram && cpu.ram.includes("DDR5")) {
-          checkedCpuNames.add(cpu.name);
-        } else if (type === "ddr4" && cpu.ram && cpu.ram.includes("DDR4")) {
-          checkedCpuNames.add(cpu.name);
-        }
-      });
+        });
+      }
+
       viewOnlyChecked = false;
       updateChart();
     }
