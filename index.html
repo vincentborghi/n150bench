@@ -419,8 +419,8 @@
       <button type="button" class="sel-btn" onclick="selectAllCpus()">Select All</button>
       <button type="button" class="sel-btn" onclick="deselectAllCpus()">Deselect All (Keep Ref)</button>
       <button type="button" class="sel-btn" onclick="selectByFilter('w11')">✓ W11 only</button>
-      <button type="button" class="sel-btn" onclick="selectByFilter('ddr5')">DDR5 only</button>
-      <button type="button" class="sel-btn" onclick="selectByFilter('ddr4')">DDR4 only</button>
+      <button type="button" class="sel-btn" onclick="selectByFilter('ddr5')" title="Select all CPUs supporting DDR5 (including hybrid DDR4/DDR5)">DDR5</button>
+      <button type="button" class="sel-btn" onclick="selectByFilter('ddr4')" title="Select all CPUs supporting DDR4 (including hybrid DDR4/DDR5)">DDR4</button>
       <span class="selection-counter" id="selectionCounter"></span>
     </div>
     <div class="selection-bar-right">
@@ -562,9 +562,9 @@
       cpuData.forEach(cpu => {
         if (type === "w11" && cpu.win11) {
           checkedCpuNames.add(cpu.name);
-        } else if (type === "ddr5" && cpu.ram && cpu.ram.includes("DDR5") && !cpu.ram.includes("DDR4")) {
+        } else if (type === "ddr5" && cpu.ram && cpu.ram.includes("DDR5")) {
           checkedCpuNames.add(cpu.name);
-        } else if (type === "ddr4" && cpu.ram && cpu.ram.includes("DDR4") && !cpu.ram.includes("DDR5")) {
+        } else if (type === "ddr4" && cpu.ram && cpu.ram.includes("DDR4")) {
           checkedCpuNames.add(cpu.name);
         }
       });
