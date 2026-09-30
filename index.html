@@ -9,7 +9,7 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 20px auto;
-      max-width: 1020px;
+      max-width: 1040px;
       padding: 0 15px;
       color: #1e293b;
       background-color: #f8fafc;
@@ -30,7 +30,7 @@
       gap: 12px;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       padding: 12px 16px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -61,7 +61,7 @@
       border-color: #0284c7;
     }
     input[type="text"] {
-      width: 220px;
+      width: 230px;
     }
     .clear-btn {
       background: #f1f5f9;
@@ -80,6 +80,87 @@
       font-size: 0.8rem;
       color: #64748b;
     }
+    /* Benchmark indicators and active sort key highlight */
+    .benchmark-indicators {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .benchmark-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .benchmark-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .benchmark-card-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .color-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .swatch-passmark { background-color: #2563eb; }
+    .swatch-gb6m { background-color: #7c3aed; }
+    .swatch-gb6s { background-color: #059669; }
+    .benchmark-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .sort-tag {
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #64748b;
+      background: #f1f5f9;
+      font-weight: 500;
+    }
+    /* Active sort key styling */
+    .benchmark-card.active-sort-passmark {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    .benchmark-card.active-sort-passmark .sort-tag {
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .benchmark-card.active-sort-gb6Multi {
+      border-color: #7c3aed;
+      background: #faf5ff;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+    }
+    .benchmark-card.active-sort-gb6Multi .sort-tag {
+      background: #7c3aed;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .benchmark-card.active-sort-gb6Single {
+      border-color: #059669;
+      background: #f0fdf4;
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+    }
+    .benchmark-card.active-sort-gb6Single .sort-tag {
+      background: #059669;
+      color: #ffffff;
+      font-weight: 700;
+    }
     .chart-container {
       background: #ffffff;
       padding: 16px;
@@ -93,7 +174,7 @@
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. The reference CPU (Intel N150) is highlighted and always kept visible.</p>
+  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. The reference CPU (Intel N150) is highlighted in fluorescent yellow and always kept visible.</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
@@ -117,6 +198,33 @@
     </div>
 
     <div class="badge-info" id="countInfo"></div>
+  </div>
+
+  <!-- Benchmark indicators showing the active sort key -->
+  <div class="benchmark-indicators">
+    <div class="benchmark-card" id="card-passmark" onclick="toggleMetricSort('passmark')">
+      <div class="benchmark-card-left">
+        <div class="color-swatch swatch-passmark"></div>
+        <span class="benchmark-name">PassMark (Multi-Thread)</span>
+      </div>
+      <span class="sort-tag" id="tag-passmark">Click to sort</span>
+    </div>
+
+    <div class="benchmark-card" id="card-gb6Multi" onclick="toggleMetricSort('gb6Multi')">
+      <div class="benchmark-card-left">
+        <div class="color-swatch swatch-gb6m"></div>
+        <span class="benchmark-name">Geekbench 6 (Multi-Core)</span>
+      </div>
+      <span class="sort-tag" id="tag-gb6Multi">Click to sort</span>
+    </div>
+
+    <div class="benchmark-card" id="card-gb6Single" onclick="toggleMetricSort('gb6Single')">
+      <div class="benchmark-card-left">
+        <div class="color-swatch swatch-gb6s"></div>
+        <span class="benchmark-name">Geekbench 6 (Single-Core)</span>
+      </div>
+      <span class="sort-tag" id="tag-gb6Single">Click to sort</span>
+    </div>
   </div>
 
   <div class="chart-container" id="chartBox">
@@ -158,17 +266,21 @@
 
     let chart = null;
 
+    function isRefLabel(label) {
+      return typeof label === "string" && label.includes("N150");
+    }
+
     function getFilteredAndSortedData() {
       const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
 
-      // Filter CPUs: keep if search query matches name, or if it is the reference CPU
+      // Filter: keep CPU if name matches query, or if it is the reference CPU
       let result = cpuData.filter(item => {
         if (item.isRef) return true;
         if (!filterText) return true;
         return item.name.toLowerCase().includes(filterText);
       });
 
-      // Sort CPUs
+      // Sort
       const sortVal = document.getElementById("sortSelect").value;
       const [key, order] = sortVal.split("-");
 
@@ -189,10 +301,83 @@
       updateChart();
     }
 
+    function toggleMetricSort(metricKey) {
+      const sortSelect = document.getElementById("sortSelect");
+      const currentVal = sortSelect.value;
+      if (currentVal === metricKey + "-asc") {
+        sortSelect.value = metricKey + "-desc";
+      } else {
+        sortSelect.value = metricKey + "-asc";
+      }
+      updateChart();
+    }
+
+    function updateSortKeyIndicators(sortKey, sortOrder) {
+      const metrics = ["passmark", "gb6Multi", "gb6Single"];
+      metrics.forEach(m => {
+        const card = document.getElementById("card-" + m);
+        const tag = document.getElementById("tag-" + m);
+        card.className = "benchmark-card";
+
+        if (sortKey === m) {
+          card.classList.add("active-sort-" + m);
+          const arrow = sortOrder === "asc" ? "▲ ASC" : "▼ DESC";
+          tag.textContent = "Sort Key " + arrow;
+        } else {
+          tag.textContent = "Click to sort";
+        }
+      });
+    }
+
+    // Custom Chart.js plugin to draw a fluorescent yellow background behind N150 row and label
+    const highlightRefPlugin = {
+      id: "highlightRefPlugin",
+      beforeDatasetsDraw(chartInstance) {
+        const yScale = chartInstance.scales.y;
+        const xScale = chartInstance.scales.x;
+        const currentLabels = chartInstance.data.labels;
+        if (!currentLabels || currentLabels.length === 0) return;
+
+        const refIndex = currentLabels.findIndex(l => isRefLabel(l));
+        if (refIndex === -1) return;
+
+        const yCenter = yScale.getPixelForValue(refIndex);
+        const rowHeight = yScale.height / currentLabels.length;
+        const top = yCenter - rowHeight / 2;
+        const ctx = chartInstance.ctx;
+
+        ctx.save();
+        // Fluorescent yellow band behind bars
+        ctx.fillStyle = "rgba(254, 240, 138, 0.40)";
+        ctx.fillRect(xScale.left, top + 1, xScale.width, rowHeight - 2);
+
+        // Fluorescent yellow badge behind the Y-axis label on the left
+        ctx.fillStyle = "#fef08a";
+        const labelAreaWidth = xScale.left - 8;
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(4, top + 3, labelAreaWidth, rowHeight - 6, 4);
+          ctx.fill();
+        } else {
+          ctx.fillRect(4, top + 3, labelAreaWidth, rowHeight - 6);
+        }
+
+        // Orange border indicator on the left edge of the chart area
+        ctx.fillStyle = "#ea580c";
+        ctx.fillRect(xScale.left - 4, top + 1, 4, rowHeight - 2);
+        ctx.restore();
+      }
+    };
+
     function updateChart() {
       const activeData = getFilteredAndSortedData();
       const labels = activeData.map(item => item.name);
       const isRefArray = activeData.map(item => item.isRef);
+
+      // Read current sort selection
+      const sortVal = document.getElementById("sortSelect").value;
+      const [sortKey, sortOrder] = sortVal.split("-");
+      updateSortKeyIndicators(sortKey, sortOrder);
 
       // Update count info
       const totalCount = cpuData.length;
@@ -207,31 +392,31 @@
       const chartBox = document.getElementById("chartBox");
       chartBox.style.height = targetHeight + "px";
 
-      // Border styling for the reference processor
-      const borderColors = isRefArray.map(ref => (ref ? "#ea580c" : "transparent"));
-      const borderWidths = isRefArray.map(ref => (ref ? 2 : 0));
+      // Enhanced styling for the reference processor
+      const borderColors = isRefArray.map(ref => (ref ? "#b45309" : "transparent"));
+      const borderWidths = isRefArray.map(ref => (ref ? 2.5 : 0));
 
       const datasets = [
         {
-          label: "PassMark CPU Mark (Multi-Thread)",
+          label: "PassMark CPU Mark (Multi-Thread)" + (sortKey === "passmark" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.passmark),
-          backgroundColor: "#2563eb",
+          backgroundColor: activeData.map(item => (item.isRef ? "#1d4ed8" : "#2563eb")),
           borderColor: borderColors,
           borderWidth: borderWidths,
           borderRadius: 3
         },
         {
-          label: "Geekbench 6 (Multi-Core)",
+          label: "Geekbench 6 (Multi-Core)" + (sortKey === "gb6Multi" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Multi),
-          backgroundColor: "#7c3aed",
+          backgroundColor: activeData.map(item => (item.isRef ? "#6d28d9" : "#7c3aed")),
           borderColor: borderColors,
           borderWidth: borderWidths,
           borderRadius: 3
         },
         {
-          label: "Geekbench 6 (Single-Core)",
+          label: "Geekbench 6 (Single-Core)" + (sortKey === "gb6Single" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Single),
-          backgroundColor: "#059669",
+          backgroundColor: activeData.map(item => (item.isRef ? "#047857" : "#059669")),
           borderColor: borderColors,
           borderWidth: borderWidths,
           borderRadius: 3
@@ -246,6 +431,7 @@
             labels: labels,
             datasets: datasets
           },
+          plugins: [highlightRefPlugin],
           options: {
             indexAxis: "y",
             responsive: true,
@@ -269,8 +455,8 @@
                     if (datasetIdx === 1) refVal = n150Ref.gb6Multi;
                     if (datasetIdx === 2) refVal = n150Ref.gb6Single;
 
-                    const isCurrentRef = activeData[context.dataIndex]?.isRef;
-                    if (isCurrentRef) {
+                    const label = context.chart.data.labels[context.dataIndex];
+                    if (isRefLabel(label)) {
                       return "Reference CPU (N150)";
                     }
                     const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
@@ -287,13 +473,16 @@
               y: {
                 grid: { display: false },
                 ticks: {
+                  // Direct check on chart.data.labels prevents stale index closures on sort/filter
                   color: function(context) {
-                    const item = activeData[context.index];
-                    return item && item.isRef ? "#ea580c" : "#334155";
+                    const currentLabels = context.chart ? context.chart.data.labels : labels;
+                    const label = currentLabels ? currentLabels[context.index] : null;
+                    return isRefLabel(label) ? "#854d0e" : "#334155";
                   },
                   font: function(context) {
-                    const item = activeData[context.index];
-                    if (item && item.isRef) {
+                    const currentLabels = context.chart ? context.chart.data.labels : labels;
+                    const label = currentLabels ? currentLabels[context.index] : null;
+                    if (isRefLabel(label)) {
                       return { weight: "bold", size: 12 };
                     }
                     return { weight: "normal", size: 12 };
