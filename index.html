@@ -27,7 +27,7 @@
     .toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
@@ -61,24 +61,98 @@
       border-color: #0284c7;
     }
     input[type="text"] {
-      width: 230px;
+      width: 210px;
     }
-    .clear-btn {
+    .clear-btn, .action-btn {
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
-      color: #64748b;
-      padding: 6px 10px;
+      color: #334155;
+      padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
     }
-    .clear-btn:hover {
+    .clear-btn:hover, .action-btn:hover {
       background: #e2e8f0;
-      color: #1e293b;
+      color: #0f172a;
+    }
+    .action-btn.unhide-btn {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      font-weight: 600;
+    }
+    .action-btn.unhide-btn:hover {
+      background: #0369a1;
     }
     .badge-info {
       font-size: 0.8rem;
       color: #64748b;
+    }
+    /* Expandable CPU Selector Panel */
+    .cpu-selector-panel {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .cpu-selector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .cpu-selector-header strong {
+      font-size: 0.92rem;
+      color: #1e293b;
+    }
+    .cpu-selector-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .cpu-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 8px 14px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .cpu-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: #334155;
+      cursor: pointer;
+      user-select: none;
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: background 0.1s ease;
+    }
+    .cpu-checkbox-item:hover {
+      background: #f1f5f9;
+    }
+    .cpu-checkbox-item.is-ref-item {
+      font-weight: 700;
+      background: #fef08a;
+      color: #854d0e;
+    }
+    .cpu-checkbox-item input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: #0284c7;
+      margin: 0;
     }
     /* Benchmark indicators and active sort key highlight */
     .benchmark-indicators {
@@ -186,12 +260,12 @@
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. Use checkboxes to show/hide metrics. The reference CPU (Intel N150) is highlighted in yellow and always kept visible.</p>
+  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. Use checkboxes to toggle metrics or select specific CPUs to compare. The reference CPU (Intel N150) is highlighted in yellow and always kept visible.</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
       <label for="filterInput">Filter:</label>
-      <input type="text" id="filterInput" placeholder="Filter by CPU name (e.g. Ryzen, Intel, i5)..." oninput="updateChart()">
+      <input type="text" id="filterInput" placeholder="Search by name (e.g. Ryzen, i5)..." oninput="updateChart()">
       <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
     </div>
 
@@ -209,7 +283,28 @@
       </select>
     </div>
 
+    <div class="toolbar-group">
+      <button type="button" class="action-btn" id="btnToggleSelector" onclick="toggleCpuSelector()">Select CPUs (28/28)</button>
+      <button type="button" class="action-btn unhide-btn" id="btnUnhideAll" onclick="unhideAll()" style="display: none;">Unhide All</button>
+    </div>
+
     <div class="badge-info" id="countInfo"></div>
+  </div>
+
+  <!-- Expandable panel to pick specific CPUs to compare -->
+  <div id="cpuSelectorPanel" class="cpu-selector-panel" style="display: none;">
+    <div class="cpu-selector-header">
+      <div>
+        <strong>Select Processors to Compare</strong>
+        <span style="font-size: 0.8rem; color: #64748b; margin-left: 8px;">(N150 is permanently pinned as reference)</span>
+      </div>
+      <div class="cpu-selector-actions">
+        <button type="button" class="action-btn" onclick="selectAllCpus()">Select All</button>
+        <button type="button" class="action-btn" onclick="deselectAllCpus()">Keep Only N150</button>
+        <button type="button" class="action-btn" onclick="toggleCpuSelector()">Done ✕</button>
+      </div>
+    </div>
+    <div class="cpu-checkbox-grid" id="cpuCheckboxGrid"></div>
   </div>
 
   <!-- Benchmark indicators with checkboxes to toggle visibility and card clicks to sort -->
@@ -280,18 +375,97 @@
 
     const n150Ref = cpuData.find(item => item.isRef);
 
+    // Set of currently selected CPU names (initially all CPUs are selected)
+    let selectedCpuNames = new Set(cpuData.map(item => item.name));
+
     let chart = null;
 
     function isRefLabel(label) {
       return typeof label === "string" && label.includes("N150");
     }
 
+    function toggleCpuSelector() {
+      const panel = document.getElementById("cpuSelectorPanel");
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+
+    function initCpuCheckboxes() {
+      const grid = document.getElementById("cpuCheckboxGrid");
+      grid.innerHTML = "";
+
+      cpuData.forEach((cpu, index) => {
+        const item = document.createElement("label");
+        item.className = "cpu-checkbox-item" + (cpu.isRef ? " is-ref-item" : "");
+
+        const chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.value = cpu.name;
+        chk.checked = selectedCpuNames.has(cpu.name);
+
+        if (cpu.isRef) {
+          chk.checked = true;
+          chk.disabled = true; // N150 cannot be disabled
+          item.title = "Reference CPU (Always visible)";
+        } else {
+          chk.onchange = function() {
+            if (this.checked) {
+              selectedCpuNames.add(cpu.name);
+            } else {
+              selectedCpuNames.delete(cpu.name);
+            }
+            updateChart();
+          };
+        }
+
+        const span = document.createElement("span");
+        span.textContent = cpu.name;
+
+        item.appendChild(chk);
+        item.appendChild(span);
+        grid.appendChild(item);
+      });
+    }
+
+    function selectAllCpus() {
+      selectedCpuNames = new Set(cpuData.map(item => item.name));
+      const checkboxes = document.querySelectorAll("#cpuCheckboxGrid input[type='checkbox']");
+      checkboxes.forEach(chk => {
+        chk.checked = true;
+      });
+      updateChart();
+    }
+
+    function deselectAllCpus() {
+      // Clear all except the reference CPU
+      selectedCpuNames = new Set([n150Ref.name]);
+      const checkboxes = document.querySelectorAll("#cpuCheckboxGrid input[type='checkbox']");
+      checkboxes.forEach(chk => {
+        if (chk.value === n150Ref.name) {
+          chk.checked = true;
+        } else {
+          chk.checked = false;
+        }
+      });
+      updateChart();
+    }
+
+    function unhideAll() {
+      selectAllCpus();
+      document.getElementById("filterInput").value = "";
+      updateChart();
+    }
+
     function getFilteredAndSortedData() {
       const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
 
-      // Filter: keep CPU if name matches query, or if it is the reference CPU
       let result = cpuData.filter(item => {
+        // N150 is permanently kept visible
         if (item.isRef) return true;
+
+        // Check if CPU is selected in custom selection
+        if (!selectedCpuNames.has(item.name)) return false;
+
+        // Check if matches text filter
         if (!filterText) return true;
         return item.name.toLowerCase().includes(filterText);
       });
@@ -438,9 +612,18 @@
       const [sortKey, sortOrder] = sortVal.split("-");
       updateSortKeyIndicators(sortKey, sortOrder);
 
-      // Update count info
+      // Update count info and button labels
       const totalCount = cpuData.length;
       const visibleCount = activeData.length;
+      const selectedCount = selectedCpuNames.size;
+      const filterText = document.getElementById("filterInput").value.trim();
+
+      document.getElementById("btnToggleSelector").textContent = `Select CPUs (${selectedCount}/${totalCount})`;
+
+      // Show Unhide All button whenever a filter or custom CPU selection is active
+      const isFiltered = (selectedCount < totalCount) || (filterText.length > 0);
+      document.getElementById("btnUnhideAll").style.display = isFiltered ? "inline-block" : "none";
+
       document.getElementById("countInfo").textContent =
         visibleCount === totalCount
           ? `Showing all ${totalCount} CPUs`
@@ -561,7 +744,8 @@
       }
     }
 
-    // Initialize chart on load
+    // Initialize checkboxes and chart on load
+    initCpuCheckboxes();
     updateChart();
   </script>
 </body>
