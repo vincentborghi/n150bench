@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPU Benchmark - Intel N150 vs Core and Ryzen</title>
+  <title>CPU Benchmark - Interactive Comparison</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -61,7 +61,14 @@
       border-color: #0284c7;
     }
     input[type="text"] {
-      width: 210px;
+      width: 180px;
+    }
+    select.ref-select {
+      max-width: 220px;
+      font-weight: 600;
+      color: #854d0e;
+      background-color: #fefce8;
+      border-color: #facc15;
     }
     .clear-btn, .action-btn {
       background: #f1f5f9;
@@ -260,12 +267,17 @@
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. Use checkboxes to toggle metrics or select specific CPUs to compare. The reference CPU (Intel N150) is highlighted in yellow and always kept visible.</p>
+  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. Choose any reference CPU, toggle metrics, or select specific processors to compare.</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
+      <label for="refSelect">Reference CPU:</label>
+      <select id="refSelect" class="ref-select" onchange="changeReferenceCpu(this.value)"></select>
+    </div>
+
+    <div class="toolbar-group">
       <label for="filterInput">Filter:</label>
-      <input type="text" id="filterInput" placeholder="Search by name (e.g. Ryzen, i5)..." oninput="updateChart()">
+      <input type="text" id="filterInput" placeholder="Search by name..." oninput="updateChart()">
       <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
     </div>
 
@@ -296,11 +308,11 @@
     <div class="cpu-selector-header">
       <div>
         <strong>Select Processors to Compare</strong>
-        <span style="font-size: 0.8rem; color: #64748b; margin-left: 8px;">(N150 is permanently pinned as reference)</span>
+        <span id="refPinnedNote" style="font-size: 0.8rem; color: #64748b; margin-left: 8px;"></span>
       </div>
       <div class="cpu-selector-actions">
         <button type="button" class="action-btn" onclick="selectAllCpus()">Select All</button>
-        <button type="button" class="action-btn" onclick="deselectAllCpus()">Keep Only N150</button>
+        <button type="button" class="action-btn" id="btnKeepOnlyRef" onclick="deselectAllCpus()">Keep Only Reference</button>
         <button type="button" class="action-btn" onclick="toggleCpuSelector()">Done ✕</button>
       </div>
     </div>
@@ -343,37 +355,38 @@
 
   <script>
     const cpuData = [
-      { name: "Intel Core i3-4030U", passmark: 1900, gb6Multi: 1250, gb6Single: 580, isRef: false },
-      { name: "Intel Core i5-4250U", passmark: 2150, gb6Multi: 1450, gb6Single: 780, isRef: false },
-      { name: "Intel Pentium Silver N5030", passmark: 2600, gb6Multi: 1600, gb6Single: 480, isRef: false },
-      { name: "Intel Core i5-4310U", passmark: 2650, gb6Multi: 1550, gb6Single: 860, isRef: false },
-      { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850, isRef: false },
-      { name: "Intel Processor N95", passmark: 5300, gb6Multi: 2850, gb6Single: 1100, isRef: false },
-      { name: "Intel Processor N150 (Ref)", passmark: 5350, gb6Multi: 2900, gb6Single: 1150, isRef: true },
-      { name: "AMD Ryzen 3 3300U", passmark: 5600, gb6Multi: 2500, gb6Single: 970, isRef: false },
-      { name: "Intel Core i5-8250U", passmark: 5900, gb6Multi: 3100, gb6Single: 980, isRef: false },
-      { name: "Intel Core i5-10310U", passmark: 6600, gb6Multi: 3400, gb6Single: 1100, isRef: false },
-      { name: "AMD Ryzen 3 4300U", passmark: 7400, gb6Multi: 3400, gb6Single: 1100, isRef: false },
-      { name: "Intel Core i7-1065G7", passmark: 8300, gb6Multi: 4100, gb6Single: 1200, isRef: false },
-      { name: "AMD Ryzen 3 5300U ES", passmark: 8800, gb6Multi: 4600, gb6Single: 1300, isRef: false },
-      { name: "AMD Ryzen 3 7330U", passmark: 10000, gb6Multi: 5200, gb6Single: 1750, isRef: false },
-      { name: "Intel Core i5-1145G7", passmark: 10100, gb6Multi: 5000, gb6Single: 1450, isRef: false },
-      { name: "AMD Ryzen 5 4500U", passmark: 11000, gb6Multi: 4500, gb6Single: 1150, isRef: false },
-      { name: "AMD Ryzen 3 5425U", passmark: 11200, gb6Multi: 5800, gb6Single: 1650, isRef: false },
-      { name: "Intel Core i3-1215U", passmark: 11200, gb6Multi: 5200, gb6Single: 1650, isRef: false },
-      { name: "AMD Ryzen 7 4700U ES", passmark: 12500, gb6Multi: 5300, gb6Single: 1350, isRef: false },
-      { name: "AMD Ryzen 5 5500U", passmark: 13000, gb6Multi: 5500, gb6Single: 1200, isRef: false },
-      { name: "Intel Core i5-1345U", passmark: 13850, gb6Multi: 8000, gb6Single: 2200, isRef: false },
-      { name: "Intel Core i9-10980HK", passmark: 15000, gb6Multi: 8500, gb6Single: 1650, isRef: false },
-      { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400, isRef: false },
-      { name: "AMD Ryzen 5 7530U", passmark: 16200, gb6Multi: 6200, gb6Single: 1900, isRef: false },
-      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950, isRef: false },
-      { name: "AMD Ryzen 5 6600H", passmark: 19000, gb6Multi: 7200, gb6Single: 1450, isRef: false },
-      { name: "AMD Ryzen 7 7735HS", passmark: 24000, gb6Multi: 11000, gb6Single: 1800, isRef: false },
-      { name: "AMD Ryzen 7 5700G", passmark: 24200, gb6Multi: 9200, gb6Single: 1900, isRef: false }
+      { name: "Intel Core i3-4030U", passmark: 1900, gb6Multi: 1250, gb6Single: 580 },
+      { name: "Intel Core i5-4250U", passmark: 2150, gb6Multi: 1450, gb6Single: 780 },
+      { name: "Intel Pentium Silver N5030", passmark: 2600, gb6Multi: 1600, gb6Single: 480 },
+      { name: "Intel Core i5-4310U", passmark: 2650, gb6Multi: 1550, gb6Single: 860 },
+      { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850 },
+      { name: "Intel Processor N95", passmark: 5300, gb6Multi: 2850, gb6Single: 1100 },
+      { name: "Intel Processor N150", passmark: 5350, gb6Multi: 2900, gb6Single: 1150 },
+      { name: "AMD Ryzen 3 3300U", passmark: 5600, gb6Multi: 2500, gb6Single: 970 },
+      { name: "Intel Core i5-8250U", passmark: 5900, gb6Multi: 3100, gb6Single: 980 },
+      { name: "Intel Core i5-10310U", passmark: 6600, gb6Multi: 3400, gb6Single: 1100 },
+      { name: "AMD Ryzen 3 4300U", passmark: 7400, gb6Multi: 3400, gb6Single: 1100 },
+      { name: "Intel Core i7-1065G7", passmark: 8300, gb6Multi: 4100, gb6Single: 1200 },
+      { name: "AMD Ryzen 3 5300U ES", passmark: 8800, gb6Multi: 4600, gb6Single: 1300 },
+      { name: "AMD Ryzen 3 7330U", passmark: 10000, gb6Multi: 5200, gb6Single: 1750 },
+      { name: "Intel Core i5-1145G7", passmark: 10100, gb6Multi: 5000, gb6Single: 1450 },
+      { name: "AMD Ryzen 5 4500U", passmark: 11000, gb6Multi: 4500, gb6Single: 1150 },
+      { name: "AMD Ryzen 3 5425U", passmark: 11200, gb6Multi: 5800, gb6Single: 1650 },
+      { name: "Intel Core i3-1215U", passmark: 11200, gb6Multi: 5200, gb6Single: 1650 },
+      { name: "AMD Ryzen 7 4700U ES", passmark: 12500, gb6Multi: 5300, gb6Single: 1350 },
+      { name: "AMD Ryzen 5 5500U", passmark: 13000, gb6Multi: 5500, gb6Single: 1200 },
+      { name: "Intel Core i5-1345U", passmark: 13850, gb6Multi: 8000, gb6Single: 2200 },
+      { name: "Intel Core i9-10980HK", passmark: 15000, gb6Multi: 8500, gb6Single: 1650 },
+      { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400 },
+      { name: "AMD Ryzen 5 7530U", passmark: 16200, gb6Multi: 6200, gb6Single: 1900 },
+      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950 },
+      { name: "AMD Ryzen 5 6600H", passmark: 19000, gb6Multi: 7200, gb6Single: 1450 },
+      { name: "AMD Ryzen 7 7735HS", passmark: 24000, gb6Multi: 11000, gb6Single: 1800 },
+      { name: "AMD Ryzen 7 5700G", passmark: 24200, gb6Multi: 9200, gb6Single: 1900 }
     ];
 
-    const n150Ref = cpuData.find(item => item.isRef);
+    // Reference CPU (Intel N150 by default, can be modified via UI)
+    let currentRefName = "Intel Processor N150";
 
     // Set of currently selected CPU names (initially all CPUs are selected)
     let selectedCpuNames = new Set(cpuData.map(item => item.name));
@@ -381,7 +394,29 @@
     let chart = null;
 
     function isRefLabel(label) {
-      return typeof label === "string" && label.includes("N150");
+      return typeof label === "string" && label.includes(currentRefName);
+    }
+
+    function initReferenceDropdown() {
+      const select = document.getElementById("refSelect");
+      select.innerHTML = "";
+      cpuData.forEach(cpu => {
+        const opt = document.createElement("option");
+        opt.value = cpu.name;
+        opt.textContent = cpu.name;
+        if (cpu.name === currentRefName) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    function changeReferenceCpu(newRefName) {
+      currentRefName = newRefName;
+      // Ensure the newly selected reference CPU is always included in the active set
+      selectedCpuNames.add(currentRefName);
+      initCpuCheckboxes();
+      updateChart();
     }
 
     function toggleCpuSelector() {
@@ -393,19 +428,24 @@
       const grid = document.getElementById("cpuCheckboxGrid");
       grid.innerHTML = "";
 
-      cpuData.forEach((cpu, index) => {
+      // Update panel notes and buttons
+      document.getElementById("refPinnedNote").textContent = `(${currentRefName} is permanently pinned as reference)`;
+      document.getElementById("btnKeepOnlyRef").textContent = `Keep Only ${currentRefName}`;
+
+      cpuData.forEach(cpu => {
+        const isRef = cpu.name === currentRefName;
         const item = document.createElement("label");
-        item.className = "cpu-checkbox-item" + (cpu.isRef ? " is-ref-item" : "");
+        item.className = "cpu-checkbox-item" + (isRef ? " is-ref-item" : "");
 
         const chk = document.createElement("input");
         chk.type = "checkbox";
         chk.value = cpu.name;
-        chk.checked = selectedCpuNames.has(cpu.name);
+        chk.checked = isRef || selectedCpuNames.has(cpu.name);
 
-        if (cpu.isRef) {
+        if (isRef) {
           chk.checked = true;
-          chk.disabled = true; // N150 cannot be disabled
-          item.title = "Reference CPU (Always visible)";
+          chk.disabled = true; // Selected reference CPU cannot be disabled
+          item.title = `Reference CPU (${currentRefName}) - Always visible`;
         } else {
           chk.onchange = function() {
             if (this.checked) {
@@ -418,7 +458,7 @@
         }
 
         const span = document.createElement("span");
-        span.textContent = cpu.name;
+        span.textContent = cpu.name + (isRef ? " (Ref)" : "");
 
         item.appendChild(chk);
         item.appendChild(span);
@@ -436,16 +476,9 @@
     }
 
     function deselectAllCpus() {
-      // Clear all except the reference CPU
-      selectedCpuNames = new Set([n150Ref.name]);
-      const checkboxes = document.querySelectorAll("#cpuCheckboxGrid input[type='checkbox']");
-      checkboxes.forEach(chk => {
-        if (chk.value === n150Ref.name) {
-          chk.checked = true;
-        } else {
-          chk.checked = false;
-        }
-      });
+      // Clear all except current reference CPU
+      selectedCpuNames = new Set([currentRefName]);
+      initCpuCheckboxes();
       updateChart();
     }
 
@@ -459,8 +492,8 @@
       const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
 
       let result = cpuData.filter(item => {
-        // N150 is permanently kept visible
-        if (item.isRef) return true;
+        // The current reference CPU is permanently kept visible
+        if (item.name === currentRefName) return true;
 
         // Check if CPU is selected in custom selection
         if (!selectedCpuNames.has(item.name)) return false;
@@ -537,7 +570,7 @@
       });
     }
 
-    // Custom Chart.js plugin to draw a fluorescent yellow background behind N150 row and label
+    // Custom Chart.js plugin to draw a fluorescent yellow background behind Reference row and label
     const highlightRefPlugin = {
       id: "highlightRefPlugin",
       beforeDraw(chartInstance) {
@@ -605,7 +638,8 @@
 
     function updateChart() {
       const activeData = getFilteredAndSortedData();
-      const labels = activeData.map(item => item.name);
+      // Dynamically append (Ref) to whichever CPU is currently the reference
+      const labels = activeData.map(item => item.name === currentRefName ? item.name + " (Ref)" : item.name);
 
       // Read current sort selection
       const sortVal = document.getElementById("sortSelect").value;
@@ -627,7 +661,7 @@
       document.getElementById("countInfo").textContent =
         visibleCount === totalCount
           ? `Showing all ${totalCount} CPUs`
-          : `Showing ${visibleCount} of ${totalCount} CPUs (N150 always pinned)`;
+          : `Showing ${visibleCount} of ${totalCount} CPUs (${currentRefName} pinned)`;
 
       // Read checkbox visibility
       const showPassmark = document.getElementById("chk-passmark").checked;
@@ -673,6 +707,9 @@
         });
       }
 
+      // Lookup current reference CPU object for relative percentage calculations
+      const currentRefObj = cpuData.find(item => item.name === currentRefName) || cpuData[0];
+
       if (!chart) {
         const ctx = document.getElementById("cpuChart").getContext("2d");
         chart = new Chart(ctx, {
@@ -688,23 +725,23 @@
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                display: false // Replaced with custom checkbox legend
+                display: false
               },
               tooltip: {
                 callbacks: {
                   afterLabel: function(context) {
                     const currentVal = context.raw;
                     const datasetKey = context.dataset.key;
-                    let refVal = n150Ref.passmark;
-                    if (datasetKey === "gb6Multi") refVal = n150Ref.gb6Multi;
-                    if (datasetKey === "gb6Single") refVal = n150Ref.gb6Single;
+                    let refVal = currentRefObj.passmark;
+                    if (datasetKey === "gb6Multi") refVal = currentRefObj.gb6Multi;
+                    if (datasetKey === "gb6Single") refVal = currentRefObj.gb6Single;
 
                     const label = context.chart.data.labels[context.dataIndex];
                     if (isRefLabel(label)) {
-                      return "Reference CPU (N150)";
+                      return `Reference CPU (${currentRefName})`;
                     }
                     const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
-                    return (diff > 0 ? "+" : "") + diff + "% vs N150";
+                    return (diff > 0 ? "+" : "") + diff + `% vs ${currentRefName}`;
                   }
                 }
               }
@@ -744,7 +781,8 @@
       }
     }
 
-    // Initialize checkboxes and chart on load
+    // Initialize dropdowns, checkboxes and chart on load
+    initReferenceDropdown();
     initCpuCheckboxes();
     updateChart();
   </script>
