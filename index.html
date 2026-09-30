@@ -200,6 +200,24 @@
       background: #f1f5f9;
       font-weight: 500;
     }
+    .only-btn {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1.3;
+      margin-left: 2px;
+    }
+    .only-btn:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+    }
     /* Active sort key styling */
     .benchmark-card.active-sort-passmark {
       border-color: #2563eb;
@@ -289,6 +307,7 @@
         <input type="checkbox" id="chk-passmark" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle PassMark visibility">
         <div class="color-swatch swatch-passmark"></div>
         <span class="benchmark-name">PassMark (Multi-Thread)</span>
+        <button type="button" class="only-btn" onclick="event.stopPropagation(); isolateMetric('passmark')" title="Show only PassMark (click again to restore all 3)">Only</button>
       </div>
       <span class="sort-tag" id="tag-passmark">Click to sort</span>
     </div>
@@ -298,6 +317,7 @@
         <input type="checkbox" id="chk-gb6Multi" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle Geekbench 6 Multi visibility">
         <div class="color-swatch swatch-gb6m"></div>
         <span class="benchmark-name">Geekbench 6 (Multi-Core)</span>
+        <button type="button" class="only-btn" onclick="event.stopPropagation(); isolateMetric('gb6Multi')" title="Show only Geekbench 6 Multi (click again to restore all 3)">Only</button>
       </div>
       <span class="sort-tag" id="tag-gb6Multi">Click to sort</span>
     </div>
@@ -307,6 +327,7 @@
         <input type="checkbox" id="chk-gb6Single" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle Geekbench 6 Single visibility">
         <div class="color-swatch swatch-gb6s"></div>
         <span class="benchmark-name">Geekbench 6 (Single-Core)</span>
+        <button type="button" class="only-btn" onclick="event.stopPropagation(); isolateMetric('gb6Single')" title="Show only Geekbench 6 Single (click again to restore all 3)">Only</button>
       </div>
       <span class="sort-tag" id="tag-gb6Single">Click to sort</span>
     </div>
@@ -471,6 +492,31 @@
       // Ensure at least one benchmark stays checked
       if (!chkP.checked && !chkM.checked && !chkS.checked) {
         chkP.checked = true;
+      }
+
+      updateChart();
+    }
+
+    function isolateMetric(metricKey) {
+      const chkP = document.getElementById("chk-passmark");
+      const chkM = document.getElementById("chk-gb6Multi");
+      const chkS = document.getElementById("chk-gb6Single");
+
+      const isAlreadyIsolated = (
+        (metricKey === "passmark" && chkP.checked && !chkM.checked && !chkS.checked) ||
+        (metricKey === "gb6Multi" && !chkP.checked && chkM.checked && !chkS.checked) ||
+        (metricKey === "gb6Single" && !chkP.checked && !chkM.checked && chkS.checked)
+      );
+
+      if (isAlreadyIsolated) {
+        // Toggle back: restore all 3 metrics
+        chkP.checked = true;
+        chkM.checked = true;
+        chkS.checked = true;
+      } else {
+        chkP.checked = (metricKey === "passmark");
+        chkM.checked = (metricKey === "gb6Multi");
+        chkS.checked = (metricKey === "gb6Single");
       }
 
       updateChart();
