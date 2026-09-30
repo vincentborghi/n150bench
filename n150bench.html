@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benchmark CPU - Intel N150 vs Core & Ryzen</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 20px auto;
+      max-width: 900px;
+      padding: 0 15px;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.15s ease;
+    }
+    button.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+    }
+    .chart-container {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      position: relative;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Comparatif des performances CPU (Mini PC & Laptops)</h1>
+  
+  <div class="controls">
+    <button class="active" onclick="switchMetric('passmarkMulti', this)">PassMark (Multi-Thread)</button>
+    <button onclick="switchMetric('gb6Multi', this)">Geekbench 6 (Multi-Core)</button>
+    <button onclick="switchMetric('gb6Single', this)">Geekbench 6 (Single-Core)</button>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="cpuChart"></canvas>
+  </div>
+
+  <script>
+    const labels = [
+      "Intel Core i5-6500T",
+      "Intel Processor N150 (Ref)",
+      "Intel Core i5-8250U",
+      "Intel Core i5-10310U",
+      "AMD Ryzen 3 4300U",
+      "Intel Core i7-1065G7",
+      "Intel Core i5-1145G7",
+      "AMD Ryzen 5 4500U",
+      "Intel Core i3-1215U",
+      "AMD Ryzen 5 5500U",
+      "AMD Ryzen 5 5600U",
+      "AMD Ryzen 5 6600H",
+      "AMD Ryzen 7 7735HS"
+    ];
+
+    const datasets = {
+      passmarkMulti: {
+        title: "Score PassMark CPU Mark (Multi-Thread)",
+        data: [4800, 5350, 5900, 6600, 7400, 8300, 10100, 11000, 11200, 13000, 15500, 19000, 24000]
+      },
+      gb6Multi: {
+        title: "Score Geekbench 6 (Multi-Core)",
+        data: [2400, 2900, 3100, 3400, 3400, 4100, 5000, 4500, 5200, 5500, 6500, 7200, 11000]
+      },
+      gb6Single: {
+        title: "Score Geekbench 6 (Single-Core)",
+        data: [850, 1150, 980, 1100, 1100, 1200, 1450, 1150, 1650, 1200, 1400, 1450, 1800]
+      }
+    };
+
+    const n150Index = 1;
+    const colors = labels.map((_, i) => i === n150Index ? "#ea580c" : "#0284c7");
+
+    const ctx = document.getElementById("cpuChart").getContext("2d");
+    const chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: datasets.passmarkMulti.title,
+          data: datasets.passmarkMulti.data,
+          backgroundColor: colors,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              afterLabel: function(context) {
+                const currentVal = context.raw;
+                const refVal = context.dataset.data[n150Index];
+                const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
+                if (context.dataIndex === n150Index) return "Base de reference";
+                return (diff > 0 ? "+" : "") + diff + " % vs N150";
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: "#e2e8f0" }
+          },
+          y: {
+            grid: { display: false }
+          }
+        }
+      }
+    });
+
+    function switchMetric(key, btn) {
+      document.querySelectorAll(".controls button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      chart.data.datasets[0].label = datasets[key].title;
+      chart.data.datasets[0].data = datasets[key].data;
+      chart.update();
+    }
+  </script>
+</body>
+</html>
+<!-- End of file -->
