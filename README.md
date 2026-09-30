@@ -11,6 +11,11 @@ Interactive CPU benchmark comparison chart highlighting the **Intel Processor N1
   - Geekbench 6 (Single-Core)
 - Visual highlighting of the reference processor (Intel N150).
 
+## Live Demo
+
+The benchmark is available live via GitHub Pages:
+https://vincentborghi.github.io/n150bench/
+
 ## Usage
 
-Simply open `n150bench.html` in any modern web browser.
+Simply open `index.html` in any modern web browser or visit the live link above.
