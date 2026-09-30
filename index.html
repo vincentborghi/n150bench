@@ -9,7 +9,7 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 20px auto;
-      max-width: 1000px;
+      max-width: 1020px;
       padding: 0 15px;
       color: #1e293b;
       background-color: #f8fafc;
@@ -20,9 +20,65 @@
     }
     p.subtitle {
       margin-top: 0;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       color: #64748b;
       font-size: 0.9rem;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    input[type="text"], select {
+      padding: 7px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      color: #1e293b;
+      background-color: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    input[type="text"]:focus, select:focus {
+      border-color: #0284c7;
+    }
+    input[type="text"] {
+      width: 220px;
+    }
+    .clear-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .clear-btn:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .badge-info {
+      font-size: 0.8rem;
+      color: #64748b;
     }
     .chart-container {
       background: #ffffff;
@@ -30,232 +86,233 @@
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       position: relative;
-      height: 1500px;
+      transition: height 0.2s ease;
     }
   </style>
 </head>
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. The reference CPU (Intel N150) is highlighted.</p>
+  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. The reference CPU (Intel N150) is highlighted and always kept visible.</p>
 
-  <div class="chart-container">
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <label for="filterInput">Filter:</label>
+      <input type="text" id="filterInput" placeholder="Filter by CPU name (e.g. Ryzen, Intel, i5)..." oninput="updateChart()">
+      <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="sortSelect">Sort by:</label>
+      <select id="sortSelect" onchange="updateChart()">
+        <option value="passmark-asc">PassMark Multi (Ascending)</option>
+        <option value="passmark-desc">PassMark Multi (Descending)</option>
+        <option value="gb6Multi-asc">Geekbench 6 Multi (Ascending)</option>
+        <option value="gb6Multi-desc">Geekbench 6 Multi (Descending)</option>
+        <option value="gb6Single-asc">Geekbench 6 Single (Ascending)</option>
+        <option value="gb6Single-desc">Geekbench 6 Single (Descending)</option>
+        <option value="name-asc">Processor Name (A to Z)</option>
+        <option value="name-desc">Processor Name (Z to A)</option>
+      </select>
+    </div>
+
+    <div class="badge-info" id="countInfo"></div>
+  </div>
+
+  <div class="chart-container" id="chartBox">
     <canvas id="cpuChart"></canvas>
   </div>
 
   <script>
-    const labels = [
-      "Intel Core i3-4030U",
-      "Intel Core i5-4250U",
-      "Intel Pentium Silver N5030",
-      "Intel Core i5-4310U",
-      "Intel Core i5-6500T",
-      "Intel Processor N95",
-      "Intel Processor N150 (Ref)",
-      "AMD Ryzen 3 3300U",
-      "Intel Core i5-8250U",
-      "Intel Core i5-10310U",
-      "AMD Ryzen 3 4300U",
-      "Intel Core i7-1065G7",
-      "AMD Ryzen 3 5300U ES",
-      "AMD Ryzen 3 7330U",
-      "Intel Core i5-1145G7",
-      "AMD Ryzen 5 4500U",
-      "AMD Ryzen 3 5425U",
-      "Intel Core i3-1215U",
-      "AMD Ryzen 7 4700U ES",
-      "AMD Ryzen 5 5500U",
-      "Intel Core i9-10980HK",
-      "AMD Ryzen 5 5600U",
-      "AMD Ryzen 5 7530U",
-      "AMD Ryzen 5 5500GT",
-      "AMD Ryzen 5 6600H",
-      "AMD Ryzen 7 7735HS",
-      "AMD Ryzen 7 5700G"
+    const cpuData = [
+      { name: "Intel Core i3-4030U", passmark: 1900, gb6Multi: 1250, gb6Single: 580, isRef: false },
+      { name: "Intel Core i5-4250U", passmark: 2150, gb6Multi: 1450, gb6Single: 780, isRef: false },
+      { name: "Intel Pentium Silver N5030", passmark: 2600, gb6Multi: 1600, gb6Single: 480, isRef: false },
+      { name: "Intel Core i5-4310U", passmark: 2650, gb6Multi: 1550, gb6Single: 860, isRef: false },
+      { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850, isRef: false },
+      { name: "Intel Processor N95", passmark: 5300, gb6Multi: 2850, gb6Single: 1100, isRef: false },
+      { name: "Intel Processor N150 (Ref)", passmark: 5350, gb6Multi: 2900, gb6Single: 1150, isRef: true },
+      { name: "AMD Ryzen 3 3300U", passmark: 5600, gb6Multi: 2500, gb6Single: 970, isRef: false },
+      { name: "Intel Core i5-8250U", passmark: 5900, gb6Multi: 3100, gb6Single: 980, isRef: false },
+      { name: "Intel Core i5-10310U", passmark: 6600, gb6Multi: 3400, gb6Single: 1100, isRef: false },
+      { name: "AMD Ryzen 3 4300U", passmark: 7400, gb6Multi: 3400, gb6Single: 1100, isRef: false },
+      { name: "Intel Core i7-1065G7", passmark: 8300, gb6Multi: 4100, gb6Single: 1200, isRef: false },
+      { name: "AMD Ryzen 3 5300U ES", passmark: 8800, gb6Multi: 4600, gb6Single: 1300, isRef: false },
+      { name: "AMD Ryzen 3 7330U", passmark: 10000, gb6Multi: 5200, gb6Single: 1750, isRef: false },
+      { name: "Intel Core i5-1145G7", passmark: 10100, gb6Multi: 5000, gb6Single: 1450, isRef: false },
+      { name: "AMD Ryzen 5 4500U", passmark: 11000, gb6Multi: 4500, gb6Single: 1150, isRef: false },
+      { name: "AMD Ryzen 3 5425U", passmark: 11200, gb6Multi: 5800, gb6Single: 1650, isRef: false },
+      { name: "Intel Core i3-1215U", passmark: 11200, gb6Multi: 5200, gb6Single: 1650, isRef: false },
+      { name: "AMD Ryzen 7 4700U ES", passmark: 12500, gb6Multi: 5300, gb6Single: 1350, isRef: false },
+      { name: "AMD Ryzen 5 5500U", passmark: 13000, gb6Multi: 5500, gb6Single: 1200, isRef: false },
+      { name: "Intel Core i9-10980HK", passmark: 15000, gb6Multi: 8500, gb6Single: 1650, isRef: false },
+      { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400, isRef: false },
+      { name: "AMD Ryzen 5 7530U", passmark: 16200, gb6Multi: 6200, gb6Single: 1900, isRef: false },
+      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950, isRef: false },
+      { name: "AMD Ryzen 5 6600H", passmark: 19000, gb6Multi: 7200, gb6Single: 1450, isRef: false },
+      { name: "AMD Ryzen 7 7735HS", passmark: 24000, gb6Multi: 11000, gb6Single: 1800, isRef: false },
+      { name: "AMD Ryzen 7 5700G", passmark: 24200, gb6Multi: 9200, gb6Single: 1900, isRef: false }
     ];
 
-    const n150Index = labels.findIndex(name => name.includes("N150"));
+    const n150Ref = cpuData.find(item => item.isRef);
 
-    // Helper to generate border colors and widths highlighting the reference CPU
-    function buildBorderColors() {
-      return labels.map((_, i) => (i === n150Index ? "#ea580c" : "transparent"));
-    }
+    let chart = null;
 
-    function buildBorderWidths() {
-      return labels.map((_, i) => (i === n150Index ? 2 : 0));
-    }
+    function getFilteredAndSortedData() {
+      const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
 
-    const datasets = [
-      {
-        label: "PassMark CPU Mark (Multi-Thread)",
-        data: [
-          1900,  // i3-4030U
-          2150,  // i5-4250U
-          2600,  // N5030
-          2650,  // i5-4310U
-          4800,  // i5-6500T
-          5300,  // N95
-          5350,  // N150
-          5600,  // Ryzen 3 3300U
-          5900,  // i5-8250U
-          6600,  // i5-10310U
-          7400,  // Ryzen 3 4300U
-          8300,  // i7-1065G7
-          8800,  // Ryzen 3 5300U ES
-          10000, // Ryzen 3 7330U
-          10100, // i5-1145G7
-          11000, // Ryzen 5 4500U
-          11200, // Ryzen 3 5425U
-          11200, // i3-1215U
-          12500, // Ryzen 7 4700U ES
-          13000, // Ryzen 5 5500U
-          15000, // i9-10980HK
-          15500, // Ryzen 5 5600U
-          16200, // Ryzen 5 7530U
-          19100, // Ryzen 5 5500GT
-          19000, // Ryzen 5 6600H
-          24000, // Ryzen 7 7735HS
-          24200  // Ryzen 7 5700G
-        ],
-        backgroundColor: "#2563eb",
-        borderColor: buildBorderColors(),
-        borderWidth: buildBorderWidths(),
-        borderRadius: 3
-      },
-      {
-        label: "Geekbench 6 (Multi-Core)",
-        data: [
-          1250,  // i3-4030U
-          1450,  // i5-4250U
-          1600,  // N5030
-          1550,  // i5-4310U
-          2400,  // i5-6500T
-          2850,  // N95
-          2900,  // N150
-          2500,  // Ryzen 3 3300U
-          3100,  // i5-8250U
-          3400,  // i5-10310U
-          3400,  // Ryzen 3 4300U
-          4100,  // i7-1065G7
-          4600,  // Ryzen 3 5300U ES
-          5200,  // Ryzen 3 7330U
-          5000,  // i5-1145G7
-          4500,  // Ryzen 5 4500U
-          5800,  // Ryzen 3 5425U
-          5200,  // i3-1215U
-          5300,  // Ryzen 7 4700U ES
-          5500,  // Ryzen 5 5500U
-          8500,  // i9-10980HK
-          6500,  // Ryzen 5 5600U
-          6200,  // Ryzen 5 7530U
-          8200,  // Ryzen 5 5500GT
-          7200,  // Ryzen 5 6600H
-          11000, // Ryzen 7 7735HS
-          9200   // Ryzen 7 5700G
-        ],
-        backgroundColor: "#7c3aed",
-        borderColor: buildBorderColors(),
-        borderWidth: buildBorderWidths(),
-        borderRadius: 3
-      },
-      {
-        label: "Geekbench 6 (Single-Core)",
-        data: [
-          580,   // i3-4030U
-          780,   // i5-4250U
-          480,   // N5030
-          860,   // i5-4310U
-          850,   // i5-6500T
-          1100,  // N95
-          1150,  // N150
-          970,   // Ryzen 3 3300U
-          980,   // i5-8250U
-          1100,  // i5-10310U
-          1100,  // Ryzen 3 4300U
-          1200,  // i7-1065G7
-          1300,  // Ryzen 3 5300U ES
-          1750,  // Ryzen 3 7330U
-          1450,  // i5-1145G7
-          1150,  // Ryzen 5 4500U
-          1650,  // Ryzen 3 5425U
-          1650,  // i3-1215U
-          1350,  // Ryzen 7 4700U ES
-          1200,  // Ryzen 5 5500U
-          1650,  // i9-10980HK
-          1400,  // Ryzen 5 5600U
-          1900,  // Ryzen 5 7530U
-          1950,  // Ryzen 5 5500GT
-          1450,  // Ryzen 5 6600H
-          1800,  // Ryzen 7 7735HS
-          1900   // Ryzen 7 5700G
-        ],
-        backgroundColor: "#059669",
-        borderColor: buildBorderColors(),
-        borderWidth: buildBorderWidths(),
-        borderRadius: 3
-      }
-    ];
+      // Filter CPUs: keep if search query matches name, or if it is the reference CPU
+      let result = cpuData.filter(item => {
+        if (item.isRef) return true;
+        if (!filterText) return true;
+        return item.name.toLowerCase().includes(filterText);
+      });
 
-    const ctx = document.getElementById("cpuChart").getContext("2d");
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: datasets
-      },
-      options: {
-        indexAxis: "y",
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: "top",
-            labels: {
-              boxWidth: 16,
-              padding: 16,
-              font: {
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              afterLabel: function(context) {
-                const currentVal = context.raw;
-                const refVal = context.dataset.data[n150Index];
-                if (!refVal) return "";
-                if (context.dataIndex === n150Index) {
-                  return "Reference CPU (N150)";
-                }
-                const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
-                return (diff > 0 ? "+" : "") + diff + "% vs N150";
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: { color: "#e2e8f0" }
-          },
-          y: {
-            grid: { display: false },
-            ticks: {
-              color: function(context) {
-                return context.index === n150Index ? "#ea580c" : "#334155";
-              },
-              font: function(context) {
-                if (context.index === n150Index) {
-                  return { weight: "bold", size: 12 };
-                }
-                return { weight: "normal", size: 12 };
-              }
-            }
-          }
+      // Sort CPUs
+      const sortVal = document.getElementById("sortSelect").value;
+      const [key, order] = sortVal.split("-");
+
+      result.sort((a, b) => {
+        const valA = a[key];
+        const valB = b[key];
+        if (typeof valA === "string") {
+          return order === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
         }
+        return order === "asc" ? valA - valB : valB - valA;
+      });
+
+      return result;
+    }
+
+    function clearFilter() {
+      document.getElementById("filterInput").value = "";
+      updateChart();
+    }
+
+    function updateChart() {
+      const activeData = getFilteredAndSortedData();
+      const labels = activeData.map(item => item.name);
+      const isRefArray = activeData.map(item => item.isRef);
+
+      // Update count info
+      const totalCount = cpuData.length;
+      const visibleCount = activeData.length;
+      document.getElementById("countInfo").textContent =
+        visibleCount === totalCount
+          ? `Showing all ${totalCount} CPUs`
+          : `Showing ${visibleCount} of ${totalCount} CPUs (N150 always pinned)`;
+
+      // Dynamically calculate container height based on number of visible CPUs
+      const targetHeight = Math.max(380, visibleCount * 54 + 80);
+      const chartBox = document.getElementById("chartBox");
+      chartBox.style.height = targetHeight + "px";
+
+      // Border styling for the reference processor
+      const borderColors = isRefArray.map(ref => (ref ? "#ea580c" : "transparent"));
+      const borderWidths = isRefArray.map(ref => (ref ? 2 : 0));
+
+      const datasets = [
+        {
+          label: "PassMark CPU Mark (Multi-Thread)",
+          data: activeData.map(item => item.passmark),
+          backgroundColor: "#2563eb",
+          borderColor: borderColors,
+          borderWidth: borderWidths,
+          borderRadius: 3
+        },
+        {
+          label: "Geekbench 6 (Multi-Core)",
+          data: activeData.map(item => item.gb6Multi),
+          backgroundColor: "#7c3aed",
+          borderColor: borderColors,
+          borderWidth: borderWidths,
+          borderRadius: 3
+        },
+        {
+          label: "Geekbench 6 (Single-Core)",
+          data: activeData.map(item => item.gb6Single),
+          backgroundColor: "#059669",
+          borderColor: borderColors,
+          borderWidth: borderWidths,
+          borderRadius: 3
+        }
+      ];
+
+      if (!chart) {
+        const ctx = document.getElementById("cpuChart").getContext("2d");
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: datasets
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+                labels: {
+                  boxWidth: 16,
+                  padding: 16,
+                  font: { size: 12 }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  afterLabel: function(context) {
+                    const currentVal = context.raw;
+                    const datasetIdx = context.datasetIndex;
+                    let refVal = n150Ref.passmark;
+                    if (datasetIdx === 1) refVal = n150Ref.gb6Multi;
+                    if (datasetIdx === 2) refVal = n150Ref.gb6Single;
+
+                    const isCurrentRef = activeData[context.dataIndex]?.isRef;
+                    if (isCurrentRef) {
+                      return "Reference CPU (N150)";
+                    }
+                    const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
+                    return (diff > 0 ? "+" : "") + diff + "% vs N150";
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: "#e2e8f0" }
+              },
+              y: {
+                grid: { display: false },
+                ticks: {
+                  color: function(context) {
+                    const item = activeData[context.index];
+                    return item && item.isRef ? "#ea580c" : "#334155";
+                  },
+                  font: function(context) {
+                    const item = activeData[context.index];
+                    if (item && item.isRef) {
+                      return { weight: "bold", size: 12 };
+                    }
+                    return { weight: "normal", size: 12 };
+                  }
+                }
+              }
+            }
+          }
+        });
+      } else {
+        chart.data.labels = labels;
+        chart.data.datasets = datasets;
+        chart.resize();
+        chart.update();
       }
-    });
+    }
+
+    // Initialize chart on load
+    updateChart();
   </script>
 </body>
 </html>
