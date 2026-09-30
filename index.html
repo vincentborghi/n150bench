@@ -9,7 +9,7 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 20px auto;
-      max-width: 980px;
+      max-width: 1000px;
       padding: 0 15px;
       color: #1e293b;
       background-color: #f8fafc;
@@ -30,7 +30,7 @@
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       position: relative;
-      height: 820px;
+      height: 1150px;
     }
   </style>
 </head>
@@ -45,22 +45,29 @@
 
   <script>
     const labels = [
+      "Intel Core i3-4030U",
       "Intel Core i5-6500T",
+      "Intel Processor N95",
       "Intel Processor N150 (Ref)",
+      "AMD Ryzen 3 3300U",
       "Intel Core i5-8250U",
       "Intel Core i5-10310U",
       "AMD Ryzen 3 4300U",
       "Intel Core i7-1065G7",
+      "AMD Ryzen 3 5300U ES",
       "Intel Core i5-1145G7",
       "AMD Ryzen 5 4500U",
+      "AMD Ryzen 3 5425U",
       "Intel Core i3-1215U",
+      "AMD Ryzen 7 4700U ES",
       "AMD Ryzen 5 5500U",
       "AMD Ryzen 5 5600U",
+      "AMD Ryzen 5 7530U",
       "AMD Ryzen 5 6600H",
       "AMD Ryzen 7 7735HS"
     ];
 
-    const n150Index = 1;
+    const n150Index = labels.findIndex(name => name.includes("N150"));
 
     // Helper to generate border colors and widths highlighting the reference CPU
     function buildBorderColors() {
@@ -74,7 +81,28 @@
     const datasets = [
       {
         label: "PassMark CPU Mark (Multi-Thread)",
-        data: [4800, 5350, 5900, 6600, 7400, 8300, 10100, 11000, 11200, 13000, 15500, 19000, 24000],
+        data: [
+          1900,  // i3-4030U
+          4800,  // i5-6500T
+          5300,  // N95
+          5350,  // N150
+          5600,  // Ryzen 3 3300U
+          5900,  // i5-8250U
+          6600,  // i5-10310U
+          7400,  // Ryzen 3 4300U
+          8300,  // i7-1065G7
+          8800,  // Ryzen 3 5300U ES
+          10100, // i5-1145G7
+          11000, // Ryzen 5 4500U
+          11200, // Ryzen 3 5425U
+          11200, // i3-1215U
+          12500, // Ryzen 7 4700U ES
+          13000, // Ryzen 5 5500U
+          15500, // Ryzen 5 5600U
+          16200, // Ryzen 5 7530U
+          19000, // Ryzen 5 6600H
+          24000  // Ryzen 7 7735HS
+        ],
         backgroundColor: "#2563eb",
         borderColor: buildBorderColors(),
         borderWidth: buildBorderWidths(),
@@ -82,7 +110,28 @@
       },
       {
         label: "Geekbench 6 (Multi-Core)",
-        data: [2400, 2900, 3100, 3400, 3400, 4100, 5000, 4500, 5200, 5500, 6500, 7200, 11000],
+        data: [
+          1250,  // i3-4030U
+          2400,  // i5-6500T
+          2850,  // N95
+          2900,  // N150
+          2500,  // Ryzen 3 3300U
+          3100,  // i5-8250U
+          3400,  // i5-10310U
+          3400,  // Ryzen 3 4300U
+          4100,  // i7-1065G7
+          4600,  // Ryzen 3 5300U ES
+          5000,  // i5-1145G7
+          4500,  // Ryzen 5 4500U
+          5800,  // Ryzen 3 5425U
+          5200,  // i3-1215U
+          5300,  // Ryzen 7 4700U ES
+          5500,  // Ryzen 5 5500U
+          6500,  // Ryzen 5 5600U
+          6200,  // Ryzen 5 7530U
+          7200,  // Ryzen 5 6600H
+          11000  // Ryzen 7 7735HS
+        ],
         backgroundColor: "#7c3aed",
         borderColor: buildBorderColors(),
         borderWidth: buildBorderWidths(),
@@ -90,7 +139,28 @@
       },
       {
         label: "Geekbench 6 (Single-Core)",
-        data: [850, 1150, 980, 1100, 1100, 1200, 1450, 1150, 1650, 1200, 1400, 1450, 1800],
+        data: [
+          580,   // i3-4030U
+          850,   // i5-6500T
+          1100,  // N95
+          1150,  // N150
+          970,   // Ryzen 3 3300U
+          980,   // i5-8250U
+          1100,  // i5-10310U
+          1100,  // Ryzen 3 4300U
+          1200,  // i7-1065G7
+          1300,  // Ryzen 3 5300U ES
+          1450,  // i5-1145G7
+          1150,  // Ryzen 5 4500U
+          1650,  // Ryzen 3 5425U
+          1650,  // i3-1215U
+          1350,  // Ryzen 7 4700U ES
+          1200,  // Ryzen 5 5500U
+          1400,  // Ryzen 5 5600U
+          1900,  // Ryzen 5 7530U
+          1450,  // Ryzen 5 6600H
+          1800   // Ryzen 7 7735HS
+        ],
         backgroundColor: "#059669",
         borderColor: buildBorderColors(),
         borderWidth: buildBorderWidths(),
