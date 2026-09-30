@@ -247,298 +247,87 @@
       transition: height 0.2s ease;
     }
 
-    /* Select CPUs Modal */
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-    .modal-backdrop.open {
-      display: flex;
-    }
-    .modal-dialog {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 840px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border: 1px solid #cbd5e1;
-      animation: modalFadeIn 0.2s ease-out;
-    }
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.97); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .modal-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f8fafc;
-    }
-    .modal-header h2 {
-      margin: 0;
-      font-size: 1.15rem;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .modal-close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      line-height: 1;
-      color: #64748b;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.15s ease;
-    }
-    .modal-close-btn:hover {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-    .modal-toolbar {
-      padding: 12px 20px;
-      background: #ffffff;
-      border-bottom: 1px solid #f1f5f9;
+    /* In-histogram Selection Bar */
+    .selection-bar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
-    .modal-search {
-      flex: 1 1 220px;
-      position: relative;
-    }
-    .modal-search input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 7px 12px 7px 30px;
-    }
-    .modal-search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #94a3b8;
-      font-size: 0.85rem;
-      pointer-events: none;
-    }
-    .modal-quick-filters {
+    .selection-bar-left {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      align-items: center;
+      gap: 8px;
     }
-    .quick-chip-btn {
+    .selection-bar-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-right: 4px;
+    }
+    .sel-btn {
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
       color: #334155;
       font-size: 0.78rem;
       font-weight: 600;
-      padding: 4px 9px;
+      padding: 5px 10px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .quick-chip-btn:hover {
+    .sel-btn:hover {
       background: #e2e8f0;
       color: #0f172a;
     }
-    .quick-chip-btn.chip-primary {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #1d4ed8;
-    }
-    .quick-chip-btn.chip-primary:hover {
-      background: #dbeafe;
-    }
-    .modal-body {
-      padding: 16px 20px;
-      overflow-y: auto;
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 8px;
-      max-height: 55vh;
-    }
-    .cpu-select-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      background: #ffffff;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      user-select: none;
-    }
-    .cpu-select-card:hover {
-      border-color: #93c5fd;
-      background: #f8fafc;
-    }
-    .cpu-select-card.selected {
-      border-color: #0284c7;
-      background: #f0f9ff;
-    }
-    .cpu-select-card.is-ref-card {
-      background: #fefce8;
-      border-color: #facc15;
-      cursor: default;
-    }
-    .cpu-select-card input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      margin: 0;
-      accent-color: #0284c7;
-    }
-    .cpu-card-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .cpu-card-title {
-      font-size: 0.86rem;
-      font-weight: 600;
-      color: #1e293b;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .cpu-card-badges {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-    }
-    .pill-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 0.7rem;
-      line-height: 1.3;
-    }
-    .pill-w11-ok {
-      background: #ecfdf5;
-      color: #15803d;
-      border: 1px solid #86efac;
-    }
-    .pill-w11-no {
-      background: #fef2f2;
-      color: #b91c1c;
-      border: 1px solid #fca5a5;
-    }
-    .pill-ram-ddr5 {
-      background: #faf5ff;
-      color: #7c3aed;
-      border: 1px solid #d8b4fe;
-    }
-    .pill-ram-ddr4 {
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid #93c5fd;
-    }
-    .pill-ram-combo {
-      background: #f0fdfa;
-      color: #0f766e;
-      border: 1px solid #99f6e4;
-    }
-    .pill-ram-ddr3 {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-    }
-    .cpu-card-score {
-      font-size: 0.75rem;
+    .selection-counter {
+      font-size: 0.82rem;
       font-weight: 600;
       color: #64748b;
+      margin-left: 6px;
     }
-    .modal-footer {
-      padding: 14px 20px;
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .modal-counter {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #334155;
-    }
-    .modal-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-apply {
+    .apply-view-btn {
       background: #0284c7;
       color: #ffffff;
       border: 1px solid #0284c7;
-      font-weight: 600;
-      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 7px 16px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.88rem;
       transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(2, 132, 199, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
-    .btn-apply:hover {
+    .apply-view-btn:hover {
       background: #0369a1;
+      border-color: #0369a1;
     }
-    .btn-cancel {
-      background: #ffffff;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-      font-weight: 500;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.88rem;
-      transition: all 0.15s ease;
+    .apply-view-btn.btn-mode-edit {
+      background: #4f46e5;
+      border-color: #4f46e5;
+      box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
     }
-    .btn-cancel:hover {
-      background: #f1f5f9;
-      color: #0f172a;
-    }
-    .action-btn.select-modal-trigger-btn {
-      background: #eff6ff;
-      border-color: #0284c7;
-      color: #0369a1;
-      font-weight: 600;
-    }
-    .action-btn.select-modal-trigger-btn:hover {
-      background: #dbeafe;
-      color: #0284c7;
+    .apply-view-btn.btn-mode-edit:hover {
+      background: #4338ca;
+      border-color: #4338ca;
     }
   </style>
 </head>
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Click the checkbox next to any CPU to hide it (or Alt+Click to isolate). Reference CPU is highlighted in yellow and always kept visible. Badges indicate RAM support (<span style="color: #1d4ed8; font-weight: 700;">DDR4</span>, <span style="color: #7c3aed; font-weight: 700;">DDR5</span>, <span style="color: #0f766e; font-weight: 700;">DDR4/5</span>) and Windows 11 compatibility (<span style="color: #16a34a; font-weight: 700;">✓ W11</span> / <span style="color: #dc2626; font-weight: 700;">✗ W11</span>).</p>
+  <p class="subtitle">Check or uncheck models directly in the histogram, then click <strong>Apply &amp; View</strong> to isolate them (or <strong>Edit Selection</strong> to show all rows again). Reference CPU is highlighted in yellow and always kept visible. Badges indicate RAM support (<span style="color: #1d4ed8; font-weight: 700;">DDR4</span>, <span style="color: #7c3aed; font-weight: 700;">DDR5</span>, <span style="color: #0f766e; font-weight: 700;">DDR4/5</span>) and Windows 11 compatibility (<span style="color: #16a34a; font-weight: 700;">✓ W11</span> / <span style="color: #dc2626; font-weight: 700;">✗ W11</span>).</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
@@ -587,21 +376,7 @@
       </select>
     </div>
 
-    <div class="toolbar-group">
-      <button type="button" class="action-btn select-modal-trigger-btn" onclick="openSelectionModal()" id="selectModalBtn" title="Check specific models to compare">
-        🎯 Select Models (<span id="visibleRatioBadge">59/59</span>)
-      </button>
-    </div>
-
     <div class="badge-info" id="countInfo"></div>
-  </div>
-
-  <!-- Bar showing hidden CPUs that can be restored with a single click -->
-  <div id="hiddenCpusBar" class="hidden-cpus-bar" style="display: none;">
-    <button type="button" class="action-btn unhide-btn" style="padding: 3px 10px; font-size: 0.8rem; margin-right: 6px;" onclick="unhideAll()">Unhide All</button>
-    <button type="button" class="action-btn select-modal-trigger-btn" style="padding: 3px 10px; font-size: 0.8rem; margin-right: 6px;" onclick="openSelectionModal()">🎯 Select Models...</button>
-    <span class="hidden-cpus-label" id="hiddenCountLabel">Hidden CPUs:</span>
-    <div id="hiddenChipsContainer" style="display: inline-flex; flex-wrap: wrap; gap: 6px;"></div>
   </div>
 
   <!-- Benchmark indicators with radio button (solo metric + sort asc), checkbox (toggle metric), and click to sort -->
@@ -634,6 +409,24 @@
         <span class="benchmark-name">Geekbench 6 (Single-Core)</span>
       </div>
       <span class="sort-tag" id="tag-gb6Single">Click to sort</span>
+    </div>
+  </div>
+
+  <!-- In-histogram selection bar: batch actions + live counter + Apply & View -->
+  <div class="selection-bar" id="selectionBar">
+    <div class="selection-bar-left">
+      <span class="selection-bar-title">Selection:</span>
+      <button type="button" class="sel-btn" onclick="selectAllCpus()">Select All</button>
+      <button type="button" class="sel-btn" onclick="deselectAllCpus()">Deselect All (Keep Ref)</button>
+      <button type="button" class="sel-btn" onclick="selectByFilter('w11')">✓ W11 only</button>
+      <button type="button" class="sel-btn" onclick="selectByFilter('ddr5')">DDR5 only</button>
+      <button type="button" class="sel-btn" onclick="selectByFilter('ddr4')">DDR4 only</button>
+      <span class="selection-counter" id="selectionCounter"></span>
+    </div>
+    <div class="selection-bar-right">
+      <button type="button" class="apply-view-btn" id="applyViewBtn" onclick="toggleViewOnlyChecked()">
+        👁️ Apply &amp; View
+      </button>
     </div>
   </div>
 
@@ -707,8 +500,11 @@
     // Reference CPU (Intel N150 by default, can be modified via UI)
     let currentRefName = "Intel Processor N150";
 
-    // Set of hidden CPU names (initially empty)
-    let hiddenCpuNames = new Set();
+    // Set of checked CPU names (all checked by default)
+    let checkedCpuNames = new Set(cpuData.map(c => c.name));
+
+    // Isolated view mode: false = show all rows with checked/dimmed states; true = isolate checked rows only
+    let viewOnlyChecked = false;
 
     let chart = null;
 
@@ -734,31 +530,8 @@
 
     function changeReferenceCpu(newRefName) {
       currentRefName = newRefName;
-      // If the newly selected reference was hidden, unhide it immediately
-      hiddenCpuNames.delete(currentRefName);
-      updateChart();
-    }
-
-    function hideCpu(name) {
-      if (name === currentRefName) return; // Reference CPU cannot be hidden
-      hiddenCpuNames.add(name);
-      updateChart();
-    }
-
-    function unhideCpu(name) {
-      hiddenCpuNames.delete(name);
-      updateChart();
-    }
-
-    function unhideAll() {
-      hiddenCpuNames.clear();
-      document.getElementById("filterInput").value = "";
-      if (document.getElementById("win11Select")) {
-        document.getElementById("win11Select").value = "all";
-      }
-      if (document.getElementById("ramSelect")) {
-        document.getElementById("ramSelect").value = "all";
-      }
+      // Reference CPU is always checked
+      checkedCpuNames.add(currentRefName);
       updateChart();
     }
 
@@ -773,31 +546,54 @@
       updateChart();
     }
 
-    function updateHiddenChipsBar() {
-      const bar = document.getElementById("hiddenCpusBar");
-      const container = document.getElementById("hiddenChipsContainer");
-      const countLabel = document.getElementById("hiddenCountLabel");
+    function selectAllCpus() {
+      cpuData.forEach(c => checkedCpuNames.add(c.name));
+      updateChart();
+    }
 
-      container.innerHTML = "";
+    function deselectAllCpus() {
+      checkedCpuNames = new Set([currentRefName]);
+      viewOnlyChecked = false;
+      updateChart();
+    }
 
-      if (hiddenCpuNames.size === 0) {
-        bar.style.display = "none";
-        return;
-      }
-
-      bar.style.display = "flex";
-      countLabel.textContent = `Hidden CPUs (${hiddenCpuNames.size}):`;
-
-      hiddenCpuNames.forEach(name => {
-        const chip = document.createElement("span");
-        chip.className = "cpu-chip";
-        chip.title = `Click to restore ${name}`;
-        chip.innerHTML = `${name} <span class="chip-plus">＋</span>`;
-        chip.onclick = function() {
-          unhideCpu(name);
-        };
-        container.appendChild(chip);
+    function selectByFilter(type) {
+      checkedCpuNames = new Set([currentRefName]);
+      cpuData.forEach(cpu => {
+        if (type === "w11" && cpu.win11) {
+          checkedCpuNames.add(cpu.name);
+        } else if (type === "ddr5" && cpu.ram && cpu.ram.includes("DDR5") && !cpu.ram.includes("DDR4")) {
+          checkedCpuNames.add(cpu.name);
+        } else if (type === "ddr4" && cpu.ram && cpu.ram.includes("DDR4") && !cpu.ram.includes("DDR5")) {
+          checkedCpuNames.add(cpu.name);
+        }
       });
+      viewOnlyChecked = false;
+      updateChart();
+    }
+
+    function toggleViewOnlyChecked() {
+      viewOnlyChecked = !viewOnlyChecked;
+      updateChart();
+    }
+
+    function updateSelectionBarUI(visibleCount, totalCount) {
+      const counter = document.getElementById("selectionCounter");
+      const applyBtn = document.getElementById("applyViewBtn");
+      const checkedCount = checkedCpuNames.size;
+      const otherCount = Math.max(0, checkedCount - 1);
+
+      if (viewOnlyChecked) {
+        counter.textContent = `Showing ${visibleCount} selected models (+ Reference ${currentRefName})`;
+        applyBtn.innerHTML = "✏️ Edit Selection (Show All Rows)";
+        applyBtn.className = "apply-view-btn btn-mode-edit";
+        applyBtn.title = "Display all rows to check or uncheck models";
+      } else {
+        counter.textContent = `${checkedCount} of ${totalCount} models checked (${otherCount} custom + Reference)`;
+        applyBtn.innerHTML = `👁️ Apply &amp; View (${checkedCount})`;
+        applyBtn.className = "apply-view-btn";
+        applyBtn.title = "Isolate and show only checked models on the chart";
+      }
     }
 
     function getFilteredAndSortedData() {
@@ -809,8 +605,8 @@
         // The current reference CPU is permanently kept visible
         if (item.name === currentRefName) return true;
 
-        // Check if CPU has been manually hidden
-        if (hiddenCpuNames.has(item.name)) return false;
+        // In isolated view mode, only show checked CPUs
+        if (viewOnlyChecked && !checkedCpuNames.has(item.name)) return false;
 
         // Check Windows 11 compatibility filter
         if (win11Filter === "supported" && !item.win11) return false;
@@ -1101,8 +897,8 @@
             ctx.lineTo(cbX + 6, cbY + 10);
             ctx.lineTo(cbX + 10.5, cbY + 4);
             ctx.stroke();
-          } else {
-            // Standard CPU checkbox: blue with white checkmark
+          } else if (checkedCpuNames.has(item.name)) {
+            // Checked CPU checkbox: blue with white checkmark
             ctx.fillStyle = "#0284c7";
             ctx.strokeStyle = "#0284c7";
             ctx.lineWidth = 1;
@@ -1123,6 +919,19 @@
             ctx.lineTo(cbX + 6, cbY + 10);
             ctx.lineTo(cbX + 10.5, cbY + 4);
             ctx.stroke();
+          } else {
+            // Unchecked CPU checkbox: empty with neutral gray border
+            ctx.fillStyle = "#ffffff";
+            ctx.strokeStyle = "#94a3b8";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+              ctx.roundRect(cbX, cbY, cbSize, cbSize, 3);
+            } else {
+              ctx.rect(cbX, cbY, cbSize, cbSize);
+            }
+            ctx.fill();
+            ctx.stroke();
           }
 
           ctx.restore();
@@ -1137,6 +946,7 @@
         const ctx = chartInstance.ctx;
         ctx.save();
         ctx.textBaseline = "middle";
+        const activeData = getFilteredAndSortedData();
 
         chartInstance.data.datasets.forEach((dataset, datasetIdx) => {
           const meta = chartInstance.getDatasetMeta(datasetIdx);
@@ -1146,9 +956,16 @@
             const val = dataset.data[index];
             if (val === undefined || val === null) return;
 
-            const isRef = chartInstance.data.labels[index] && isRefLabel(chartInstance.data.labels[index]);
-            ctx.fillStyle = isRef ? "#0f172a" : "#475569";
-            ctx.font = isRef ? "bold 11px sans-serif" : "600 10px sans-serif";
+            const item = activeData[index];
+            const isChecked = item ? (item.name === currentRefName || checkedCpuNames.has(item.name)) : true;
+            if (!isChecked && !viewOnlyChecked) {
+              ctx.fillStyle = "#94a3b8";
+              ctx.font = "500 10px sans-serif";
+            } else {
+              const isRef = chartInstance.data.labels[index] && isRefLabel(chartInstance.data.labels[index]);
+              ctx.fillStyle = isRef ? "#0f172a" : "#475569";
+              ctx.font = isRef ? "bold 11px sans-serif" : "600 10px sans-serif";
+            }
 
             const formatted = val.toLocaleString("en-US");
             ctx.fillText(formatted, bar.x + 5, bar.y);
@@ -1172,9 +989,6 @@
       // Update count info and button labels
       const totalCount = cpuData.length;
       const visibleCount = activeData.length;
-      const hiddenCount = hiddenCpuNames.size;
-      const filterText = document.getElementById("filterInput").value.trim();
-
 
       document.getElementById("countInfo").textContent =
         visibleCount === totalCount
@@ -1186,8 +1000,8 @@
         ratioBadge.textContent = `${visibleCount}/${totalCount}`;
       }
 
-      // Update hidden CPU chips bar
-      updateHiddenChipsBar();
+      // Update in-histogram selection bar UI
+      updateSelectionBarUI(visibleCount, totalCount);
 
       // Read checkbox visibility
       const showPassmark = document.getElementById("chk-passmark").checked;
@@ -1213,7 +1027,10 @@
           key: "passmark",
           label: "PassMark CPU Mark (Multi-Thread)" + (sortKey === "passmark" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.passmark),
-          backgroundColor: "#2563eb",
+          backgroundColor: activeData.map(item => {
+            const isChecked = item.name === currentRefName || checkedCpuNames.has(item.name);
+            return isChecked || viewOnlyChecked ? "#2563eb" : "rgba(37, 99, 235, 0.20)";
+          }),
           borderRadius: 3
         });
       }
@@ -1223,7 +1040,10 @@
           key: "gb6Multi",
           label: "Geekbench 6 (Multi-Core)" + (sortKey === "gb6Multi" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Multi),
-          backgroundColor: "#7c3aed",
+          backgroundColor: activeData.map(item => {
+            const isChecked = item.name === currentRefName || checkedCpuNames.has(item.name);
+            return isChecked || viewOnlyChecked ? "#7c3aed" : "rgba(124, 58, 237, 0.20)";
+          }),
           borderRadius: 3
         });
       }
@@ -1233,7 +1053,10 @@
           key: "gb6Single",
           label: "Geekbench 6 (Single-Core)" + (sortKey === "gb6Single" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Single),
-          backgroundColor: "#059669",
+          backgroundColor: activeData.map(item => {
+            const isChecked = item.name === currentRefName || checkedCpuNames.has(item.name);
+            return isChecked || viewOnlyChecked ? "#059669" : "rgba(5, 150, 105, 0.20)";
+          }),
           borderRadius: 3
         });
       }
@@ -1303,7 +1126,13 @@
                   color: function(context) {
                     const currentLabels = context.chart ? context.chart.data.labels : labels;
                     const label = currentLabels ? currentLabels[context.index] : null;
-                    return isRefLabel(label) ? "#0f172a" : "#334155";
+                    if (isRefLabel(label)) return "#0f172a";
+                    const currentData = getFilteredAndSortedData();
+                    const item = currentData ? currentData[context.index] : null;
+                    if (item && !checkedCpuNames.has(item.name) && !viewOnlyChecked) {
+                      return "#94a3b8";
+                    }
+                    return "#334155";
                   },
                   font: function(context) {
                     const currentLabels = context.chart ? context.chart.data.labels : labels;
@@ -1348,17 +1177,19 @@
                 const clickedItem = currentData[i];
                 if (!clickedItem) break;
 
-                // Reference CPU cannot be hidden
+                // Reference CPU cannot be unchecked
                 if (clickedItem.name === currentRefName) break;
 
                 if (event.altKey) {
                   // Alt+Click isolates this CPU with the reference CPU
-                  hiddenCpuNames = new Set(
-                    cpuData.map(c => c.name).filter(n => n !== clickedItem.name && n !== currentRefName)
-                  );
+                  checkedCpuNames = new Set([currentRefName, clickedItem.name]);
                 } else {
-                  // Standard click: toggle hide for this CPU
-                  hiddenCpuNames.add(clickedItem.name);
+                  // Standard click: toggle check state for this CPU
+                  if (checkedCpuNames.has(clickedItem.name)) {
+                    checkedCpuNames.delete(clickedItem.name);
+                  } else {
+                    checkedCpuNames.add(clickedItem.name);
+                  }
                 }
                 updateChart();
                 break;
@@ -1399,10 +1230,13 @@
               if (mouseX >= cbLeft && mouseX <= cbRight) {
                 if (hoveredItem.name !== currentRefName) {
                   canvas.style.cursor = "pointer";
-                  canvas.title = `Click to hide ${hoveredItem.name} (Alt+Click to isolate)`;
+                  const isChecked = checkedCpuNames.has(hoveredItem.name);
+                  canvas.title = isChecked
+                    ? `Click to uncheck ${hoveredItem.name} (Alt+Click to isolate)`
+                    : `Click to check ${hoveredItem.name}`;
                 } else {
                   canvas.style.cursor = "default";
-                  canvas.title = "Reference CPU (permanently visible)";
+                  canvas.title = "Reference CPU (permanently selected)";
                 }
                 return;
               }
@@ -1436,248 +1270,9 @@
       }
     }
 
-    // Modal selection state (temporary Set of checked CPU names while modal is open)
-    let modalCheckedNames = new Set();
-
-    function openSelectionModal() {
-      const modal = document.getElementById("selectionModal");
-      const searchInput = document.getElementById("modalSearchInput");
-      searchInput.value = "";
-
-      // Initialize modalCheckedNames with currently visible CPUs
-      modalCheckedNames = new Set();
-      cpuData.forEach(cpu => {
-        if (!hiddenCpuNames.has(cpu.name)) {
-          modalCheckedNames.add(cpu.name);
-        }
-      });
-      // Reference CPU is always checked
-      modalCheckedNames.add(currentRefName);
-
-      renderModalCards();
-      updateModalCounter();
-      modal.classList.add("open");
-      searchInput.focus();
-    }
-
-    function closeSelectionModal() {
-      const modal = document.getElementById("selectionModal");
-      modal.classList.remove("open");
-    }
-
-    function handleModalBackdropClick(event) {
-      if (event.target.id === "selectionModal") {
-        closeSelectionModal();
-      }
-    }
-
-    // Close modal on Escape key
-    window.addEventListener("keydown", function(e) {
-      if (e.key === "Escape") {
-        const modal = document.getElementById("selectionModal");
-        if (modal && modal.classList.contains("open")) {
-          closeSelectionModal();
-        }
-      }
-    });
-
-    function renderModalCards() {
-      const container = document.getElementById("modalCpuCardsContainer");
-      const filterText = document.getElementById("modalSearchInput").value.trim().toLowerCase();
-      container.innerHTML = "";
-
-      // Sort alphabetically for comfortable browsing
-      const sortedCpus = [...cpuData].sort((a, b) => a.name.localeCompare(b.name));
-
-      sortedCpus.forEach(cpu => {
-        const isMatch = !filterText || cpu.name.toLowerCase().includes(filterText);
-        if (!isMatch) return;
-
-        const isRef = cpu.name === currentRefName;
-        const isChecked = isRef || modalCheckedNames.has(cpu.name);
-
-        const card = document.createElement("div");
-        card.className = "cpu-select-card" + (isChecked ? " selected" : "") + (isRef ? " is-ref-card" : "");
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = isChecked;
-        checkbox.disabled = isRef; // Reference CPU cannot be unchecked
-
-        checkbox.onchange = function(e) {
-          e.stopPropagation();
-          toggleModalCpuCheck(cpu.name, checkbox.checked, card);
-        };
-
-        card.onclick = function() {
-          if (isRef) return;
-          checkbox.checked = !checkbox.checked;
-          toggleModalCpuCheck(cpu.name, checkbox.checked, card);
-        };
-
-        const info = document.createElement("div");
-        info.className = "cpu-card-info";
-
-        const title = document.createElement("div");
-        title.className = "cpu-card-title";
-        title.textContent = cpu.name + (isRef ? " (Reference CPU)" : "");
-
-        const badges = document.createElement("div");
-        badges.className = "cpu-card-badges";
-
-        // W11 badge
-        const w11Badge = document.createElement("span");
-        w11Badge.className = "pill-badge " + (cpu.win11 ? "pill-w11-ok" : "pill-w11-no");
-        w11Badge.textContent = cpu.win11 ? "✓ W11" : "✗ W11";
-        badges.appendChild(w11Badge);
-
-        // RAM badge
-        const ramBadge = document.createElement("span");
-        const hasDdr5 = cpu.ram && cpu.ram.includes("DDR5");
-        const hasDdr4 = cpu.ram && cpu.ram.includes("DDR4");
-        const hasDdr3 = cpu.ram && cpu.ram.includes("DDR3");
-
-        let ramClass = "pill-ram-ddr4";
-        let ramText = "DDR4";
-        if (hasDdr4 && hasDdr5) {
-          ramClass = "pill-ram-combo";
-          ramText = "DDR4/5";
-        } else if (hasDdr5) {
-          ramClass = "pill-ram-ddr5";
-          ramText = "DDR5";
-        } else if (hasDdr4) {
-          ramClass = "pill-ram-ddr4";
-          ramText = "DDR4";
-        } else if (hasDdr3) {
-          ramClass = "pill-ram-ddr3";
-          ramText = "DDR3";
-        }
-        ramBadge.className = "pill-badge " + ramClass;
-        ramBadge.textContent = ramText;
-        badges.appendChild(ramBadge);
-
-        // PassMark Score tag
-        const scoreTag = document.createElement("span");
-        scoreTag.className = "cpu-card-score";
-        scoreTag.textContent = `${cpu.passmark.toLocaleString()} pts`;
-        badges.appendChild(scoreTag);
-
-        info.appendChild(title);
-        info.appendChild(badges);
-
-        card.appendChild(checkbox);
-        card.appendChild(info);
-
-        container.appendChild(card);
-      });
-    }
-
-    function toggleModalCpuCheck(name, checked, card) {
-      if (name === currentRefName) return;
-      if (checked) {
-        modalCheckedNames.add(name);
-        card.classList.add("selected");
-      } else {
-        modalCheckedNames.delete(name);
-        card.classList.remove("selected");
-      }
-      updateModalCounter();
-    }
-
-    function filterModalCards() {
-      renderModalCards();
-    }
-
-    function updateModalCounter() {
-      const counter = document.getElementById("modalCounterText");
-      const total = cpuData.length;
-      const count = modalCheckedNames.size;
-      const otherCount = count - 1; // excluding Ref
-      counter.textContent = `${count} of ${total} models selected (${otherCount} custom + Reference ${currentRefName})`;
-    }
-
-    function modalSelectAll() {
-      cpuData.forEach(cpu => modalCheckedNames.add(cpu.name));
-      renderModalCards();
-      updateModalCounter();
-    }
-
-    function modalClearAll() {
-      modalCheckedNames.clear();
-      modalCheckedNames.add(currentRefName); // Reference CPU is always preserved
-      renderModalCards();
-      updateModalCounter();
-    }
-
-    function modalFilterBy(type) {
-      modalCheckedNames.clear();
-      modalCheckedNames.add(currentRefName);
-
-      cpuData.forEach(cpu => {
-        if (type === "w11" && cpu.win11) {
-          modalCheckedNames.add(cpu.name);
-        } else if (type === "ddr5" && cpu.ram && cpu.ram.includes("DDR5") && !cpu.ram.includes("DDR4")) {
-          modalCheckedNames.add(cpu.name);
-        } else if (type === "ddr4" && cpu.ram && cpu.ram.includes("DDR4") && !cpu.ram.includes("DDR5")) {
-          modalCheckedNames.add(cpu.name);
-        }
-      });
-
-      renderModalCards();
-      updateModalCounter();
-    }
-
-    function applyModalSelection() {
-      // Hidden CPUs are all those in cpuData that are NOT in modalCheckedNames
-      hiddenCpuNames.clear();
-      cpuData.forEach(cpu => {
-        if (cpu.name !== currentRefName && !modalCheckedNames.has(cpu.name)) {
-          hiddenCpuNames.add(cpu.name);
-        }
-      });
-      closeSelectionModal();
-      updateChart();
-    }
-
     // Initialize reference dropdown and chart on load
     initReferenceDropdown();
     updateChart();
   </script>
-
-  <!-- Modal for selecting specific models to compare -->
-  <div id="selectionModal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
-    <div class="modal-dialog" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h2><span>🎯</span> Select CPUs to Compare</h2>
-        <button type="button" class="modal-close-btn" onclick="closeSelectionModal()" title="Close">&times;</button>
-      </div>
-
-      <div class="modal-toolbar">
-        <div class="modal-search">
-          <span class="modal-search-icon">🔍</span>
-          <input type="text" id="modalSearchInput" placeholder="Filter models by name..." oninput="filterModalCards()">
-        </div>
-        <div class="modal-quick-filters">
-          <button type="button" class="quick-chip-btn chip-primary" onclick="modalSelectAll()">Select All</button>
-          <button type="button" class="quick-chip-btn" onclick="modalClearAll()">Deselect All (Keep Ref)</button>
-          <button type="button" class="quick-chip-btn" onclick="modalFilterBy('w11')">✓ W11 only</button>
-          <button type="button" class="quick-chip-btn" onclick="modalFilterBy('ddr5')">DDR5 only</button>
-          <button type="button" class="quick-chip-btn" onclick="modalFilterBy('ddr4')">DDR4 only</button>
-        </div>
-      </div>
-
-      <div class="modal-body" id="modalCpuCardsContainer">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <div class="modal-footer">
-        <div class="modal-counter" id="modalCounterText">0 models selected</div>
-        <div class="modal-actions">
-          <button type="button" class="btn-cancel" onclick="closeSelectionModal()">Cancel</button>
-          <button type="button" class="btn-apply" onclick="applyModalSelection()">Apply &amp; View Chart</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
