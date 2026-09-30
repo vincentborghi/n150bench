@@ -368,7 +368,8 @@
     function initReferenceDropdown() {
       const select = document.getElementById("refSelect");
       select.innerHTML = "";
-      cpuData.forEach(cpu => {
+      const sortedCpus = [...cpuData].sort((a, b) => a.name.localeCompare(b.name));
+      sortedCpus.forEach(cpu => {
         const opt = document.createElement("option");
         opt.value = cpu.name;
         opt.textContent = cpu.name;
