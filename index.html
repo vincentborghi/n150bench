@@ -246,6 +246,293 @@
       position: relative;
       transition: height 0.2s ease;
     }
+
+    /* Select CPUs Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-dialog {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 840px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      line-height: 1;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .modal-toolbar {
+      padding: 12px 20px;
+      background: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .modal-search {
+      flex: 1 1 220px;
+      position: relative;
+    }
+    .modal-search input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 7px 12px 7px 30px;
+    }
+    .modal-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+    .modal-quick-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .quick-chip-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .quick-chip-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .quick-chip-btn.chip-primary {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+    }
+    .quick-chip-btn.chip-primary:hover {
+      background: #dbeafe;
+    }
+    .modal-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 8px;
+      max-height: 55vh;
+    }
+    .cpu-select-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .cpu-select-card:hover {
+      border-color: #93c5fd;
+      background: #f8fafc;
+    }
+    .cpu-select-card.selected {
+      border-color: #0284c7;
+      background: #f0f9ff;
+    }
+    .cpu-select-card.is-ref-card {
+      background: #fefce8;
+      border-color: #facc15;
+      cursor: default;
+    }
+    .cpu-select-card input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      margin: 0;
+      accent-color: #0284c7;
+    }
+    .cpu-card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .cpu-card-title {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cpu-card-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+    }
+    .pill-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      line-height: 1.3;
+    }
+    .pill-w11-ok {
+      background: #ecfdf5;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+    .pill-w11-no {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+    .pill-ram-ddr5 {
+      background: #faf5ff;
+      color: #7c3aed;
+      border: 1px solid #d8b4fe;
+    }
+    .pill-ram-ddr4 {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #93c5fd;
+    }
+    .pill-ram-combo {
+      background: #f0fdfa;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+    }
+    .pill-ram-ddr3 {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .cpu-card-score {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .modal-footer {
+      padding: 14px 20px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .modal-counter {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-apply {
+      background: #0284c7;
+      color: #ffffff;
+      border: 1px solid #0284c7;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: all 0.15s ease;
+    }
+    .btn-apply:hover {
+      background: #0369a1;
+    }
+    .btn-cancel {
+      background: #ffffff;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: all 0.15s ease;
+    }
+    .btn-cancel:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .action-btn.select-modal-trigger-btn {
+      background: #eff6ff;
+      border-color: #0284c7;
+      color: #0369a1;
+      font-weight: 600;
+    }
+    .action-btn.select-modal-trigger-btn:hover {
+      background: #dbeafe;
+      color: #0284c7;
+    }
   </style>
 </head>
 <body>
@@ -300,12 +587,19 @@
       </select>
     </div>
 
+    <div class="toolbar-group">
+      <button type="button" class="action-btn select-modal-trigger-btn" onclick="openSelectionModal()" id="selectModalBtn" title="Check specific models to compare">
+        🎯 Select Models (<span id="visibleRatioBadge">59/59</span>)
+      </button>
+    </div>
+
     <div class="badge-info" id="countInfo"></div>
   </div>
 
   <!-- Bar showing hidden CPUs that can be restored with a single click -->
   <div id="hiddenCpusBar" class="hidden-cpus-bar" style="display: none;">
     <button type="button" class="action-btn unhide-btn" style="padding: 3px 10px; font-size: 0.8rem; margin-right: 6px;" onclick="unhideAll()">Unhide All</button>
+    <button type="button" class="action-btn select-modal-trigger-btn" style="padding: 3px 10px; font-size: 0.8rem; margin-right: 6px;" onclick="openSelectionModal()">🎯 Select Models...</button>
     <span class="hidden-cpus-label" id="hiddenCountLabel">Hidden CPUs:</span>
     <div id="hiddenChipsContainer" style="display: inline-flex; flex-wrap: wrap; gap: 6px;"></div>
   </div>
@@ -358,6 +652,7 @@
       { name: "Intel Core i5-8210Y", passmark: 2700, gb6Multi: 1700, gb6Single: 800, win11: true, ram: ["DDR3"], ramDesc: "LPDDR3-2133 (Dual Channel)" },
       { name: "Intel Core i5-7Y54", passmark: 2890, gb6Multi: 1700, gb6Single: 900, win11: false, ram: ["DDR3"], ramDesc: "LPDDR3-1866 / DDR3L-1600 (Dual Channel)" },
       { name: "Intel Core i3-10110U", passmark: 3600, gb6Multi: 2200, gb6Single: 1050, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2666 / LPDDR4-2933 (Dual Channel)" },
+      { name: "AMD Ryzen 3 3200U", passmark: 3700, gb6Multi: 1950, gb6Single: 940, win11: false, ram: ["DDR4"], ramDesc: "DDR4-2400 (Dual Channel)" },
       { name: "Intel Celeron N5095", passmark: 4000, gb6Multi: 1450, gb6Single: 500, win11: false, ram: ["DDR4"], ramDesc: "DDR4-2933 / LPDDR4x-2933 (Dual Channel)" },
       { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850, win11: false, ram: ["DDR4"], ramDesc: "DDR4-2133 / DDR3L-1600 (Dual Channel)" },
       { name: "Intel Pentium Gold 7505", passmark: 5150, gb6Multi: 2900, gb6Single: 1450, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4x-3733 (Dual Channel)" },
@@ -886,6 +1181,11 @@
           ? `Showing all ${totalCount} CPUs`
           : `Showing ${visibleCount} of ${totalCount} CPUs (${currentRefName} pinned)`;
 
+      const ratioBadge = document.getElementById("visibleRatioBadge");
+      if (ratioBadge) {
+        ratioBadge.textContent = `${visibleCount}/${totalCount}`;
+      }
+
       // Update hidden CPU chips bar
       updateHiddenChipsBar();
 
@@ -1136,9 +1436,248 @@
       }
     }
 
+    // Modal selection state (temporary Set of checked CPU names while modal is open)
+    let modalCheckedNames = new Set();
+
+    function openSelectionModal() {
+      const modal = document.getElementById("selectionModal");
+      const searchInput = document.getElementById("modalSearchInput");
+      searchInput.value = "";
+
+      // Initialize modalCheckedNames with currently visible CPUs
+      modalCheckedNames = new Set();
+      cpuData.forEach(cpu => {
+        if (!hiddenCpuNames.has(cpu.name)) {
+          modalCheckedNames.add(cpu.name);
+        }
+      });
+      // Reference CPU is always checked
+      modalCheckedNames.add(currentRefName);
+
+      renderModalCards();
+      updateModalCounter();
+      modal.classList.add("open");
+      searchInput.focus();
+    }
+
+    function closeSelectionModal() {
+      const modal = document.getElementById("selectionModal");
+      modal.classList.remove("open");
+    }
+
+    function handleModalBackdropClick(event) {
+      if (event.target.id === "selectionModal") {
+        closeSelectionModal();
+      }
+    }
+
+    // Close modal on Escape key
+    window.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        const modal = document.getElementById("selectionModal");
+        if (modal && modal.classList.contains("open")) {
+          closeSelectionModal();
+        }
+      }
+    });
+
+    function renderModalCards() {
+      const container = document.getElementById("modalCpuCardsContainer");
+      const filterText = document.getElementById("modalSearchInput").value.trim().toLowerCase();
+      container.innerHTML = "";
+
+      // Sort alphabetically for comfortable browsing
+      const sortedCpus = [...cpuData].sort((a, b) => a.name.localeCompare(b.name));
+
+      sortedCpus.forEach(cpu => {
+        const isMatch = !filterText || cpu.name.toLowerCase().includes(filterText);
+        if (!isMatch) return;
+
+        const isRef = cpu.name === currentRefName;
+        const isChecked = isRef || modalCheckedNames.has(cpu.name);
+
+        const card = document.createElement("div");
+        card.className = "cpu-select-card" + (isChecked ? " selected" : "") + (isRef ? " is-ref-card" : "");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = isChecked;
+        checkbox.disabled = isRef; // Reference CPU cannot be unchecked
+
+        checkbox.onchange = function(e) {
+          e.stopPropagation();
+          toggleModalCpuCheck(cpu.name, checkbox.checked, card);
+        };
+
+        card.onclick = function() {
+          if (isRef) return;
+          checkbox.checked = !checkbox.checked;
+          toggleModalCpuCheck(cpu.name, checkbox.checked, card);
+        };
+
+        const info = document.createElement("div");
+        info.className = "cpu-card-info";
+
+        const title = document.createElement("div");
+        title.className = "cpu-card-title";
+        title.textContent = cpu.name + (isRef ? " (Reference CPU)" : "");
+
+        const badges = document.createElement("div");
+        badges.className = "cpu-card-badges";
+
+        // W11 badge
+        const w11Badge = document.createElement("span");
+        w11Badge.className = "pill-badge " + (cpu.win11 ? "pill-w11-ok" : "pill-w11-no");
+        w11Badge.textContent = cpu.win11 ? "✓ W11" : "✗ W11";
+        badges.appendChild(w11Badge);
+
+        // RAM badge
+        const ramBadge = document.createElement("span");
+        const hasDdr5 = cpu.ram && cpu.ram.includes("DDR5");
+        const hasDdr4 = cpu.ram && cpu.ram.includes("DDR4");
+        const hasDdr3 = cpu.ram && cpu.ram.includes("DDR3");
+
+        let ramClass = "pill-ram-ddr4";
+        let ramText = "DDR4";
+        if (hasDdr4 && hasDdr5) {
+          ramClass = "pill-ram-combo";
+          ramText = "DDR4/5";
+        } else if (hasDdr5) {
+          ramClass = "pill-ram-ddr5";
+          ramText = "DDR5";
+        } else if (hasDdr4) {
+          ramClass = "pill-ram-ddr4";
+          ramText = "DDR4";
+        } else if (hasDdr3) {
+          ramClass = "pill-ram-ddr3";
+          ramText = "DDR3";
+        }
+        ramBadge.className = "pill-badge " + ramClass;
+        ramBadge.textContent = ramText;
+        badges.appendChild(ramBadge);
+
+        // PassMark Score tag
+        const scoreTag = document.createElement("span");
+        scoreTag.className = "cpu-card-score";
+        scoreTag.textContent = `${cpu.passmark.toLocaleString()} pts`;
+        badges.appendChild(scoreTag);
+
+        info.appendChild(title);
+        info.appendChild(badges);
+
+        card.appendChild(checkbox);
+        card.appendChild(info);
+
+        container.appendChild(card);
+      });
+    }
+
+    function toggleModalCpuCheck(name, checked, card) {
+      if (name === currentRefName) return;
+      if (checked) {
+        modalCheckedNames.add(name);
+        card.classList.add("selected");
+      } else {
+        modalCheckedNames.delete(name);
+        card.classList.remove("selected");
+      }
+      updateModalCounter();
+    }
+
+    function filterModalCards() {
+      renderModalCards();
+    }
+
+    function updateModalCounter() {
+      const counter = document.getElementById("modalCounterText");
+      const total = cpuData.length;
+      const count = modalCheckedNames.size;
+      const otherCount = count - 1; // excluding Ref
+      counter.textContent = `${count} of ${total} models selected (${otherCount} custom + Reference ${currentRefName})`;
+    }
+
+    function modalSelectAll() {
+      cpuData.forEach(cpu => modalCheckedNames.add(cpu.name));
+      renderModalCards();
+      updateModalCounter();
+    }
+
+    function modalClearAll() {
+      modalCheckedNames.clear();
+      modalCheckedNames.add(currentRefName); // Reference CPU is always preserved
+      renderModalCards();
+      updateModalCounter();
+    }
+
+    function modalFilterBy(type) {
+      modalCheckedNames.clear();
+      modalCheckedNames.add(currentRefName);
+
+      cpuData.forEach(cpu => {
+        if (type === "w11" && cpu.win11) {
+          modalCheckedNames.add(cpu.name);
+        } else if (type === "ddr5" && cpu.ram && cpu.ram.includes("DDR5") && !cpu.ram.includes("DDR4")) {
+          modalCheckedNames.add(cpu.name);
+        } else if (type === "ddr4" && cpu.ram && cpu.ram.includes("DDR4") && !cpu.ram.includes("DDR5")) {
+          modalCheckedNames.add(cpu.name);
+        }
+      });
+
+      renderModalCards();
+      updateModalCounter();
+    }
+
+    function applyModalSelection() {
+      // Hidden CPUs are all those in cpuData that are NOT in modalCheckedNames
+      hiddenCpuNames.clear();
+      cpuData.forEach(cpu => {
+        if (cpu.name !== currentRefName && !modalCheckedNames.has(cpu.name)) {
+          hiddenCpuNames.add(cpu.name);
+        }
+      });
+      closeSelectionModal();
+      updateChart();
+    }
+
     // Initialize reference dropdown and chart on load
     initReferenceDropdown();
     updateChart();
   </script>
+
+  <!-- Modal for selecting specific models to compare -->
+  <div id="selectionModal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
+    <div class="modal-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2><span>🎯</span> Select CPUs to Compare</h2>
+        <button type="button" class="modal-close-btn" onclick="closeSelectionModal()" title="Close">&times;</button>
+      </div>
+
+      <div class="modal-toolbar">
+        <div class="modal-search">
+          <span class="modal-search-icon">🔍</span>
+          <input type="text" id="modalSearchInput" placeholder="Filter models by name..." oninput="filterModalCards()">
+        </div>
+        <div class="modal-quick-filters">
+          <button type="button" class="quick-chip-btn chip-primary" onclick="modalSelectAll()">Select All</button>
+          <button type="button" class="quick-chip-btn" onclick="modalClearAll()">Deselect All (Keep Ref)</button>
+          <button type="button" class="quick-chip-btn" onclick="modalFilterBy('w11')">✓ W11 only</button>
+          <button type="button" class="quick-chip-btn" onclick="modalFilterBy('ddr5')">DDR5 only</button>
+          <button type="button" class="quick-chip-btn" onclick="modalFilterBy('ddr4')">DDR4 only</button>
+        </div>
+      </div>
+
+      <div class="modal-body" id="modalCpuCardsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-counter" id="modalCounterText">0 models selected</div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeSelectionModal()">Cancel</button>
+          <button type="button" class="btn-apply" onclick="applyModalSelection()">Apply &amp; View Chart</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
