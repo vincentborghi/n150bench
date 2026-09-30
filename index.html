@@ -272,10 +272,6 @@
       </select>
     </div>
 
-    <div class="toolbar-group">
-      <button type="button" class="action-btn unhide-btn" id="btnUnhideAll" onclick="unhideAll()" style="display: none;">Unhide All</button>
-    </div>
-
     <div class="badge-info" id="countInfo"></div>
   </div>
 
@@ -670,9 +666,6 @@
       const hiddenCount = hiddenCpuNames.size;
       const filterText = document.getElementById("filterInput").value.trim();
 
-      // Show Unhide All button whenever a filter or hidden CPUs are present
-      const isFiltered = (hiddenCount > 0) || (filterText.length > 0);
-      document.getElementById("btnUnhideAll").style.display = isFiltered ? "inline-block" : "none";
 
       document.getElementById("countInfo").textContent =
         visibleCount === totalCount
