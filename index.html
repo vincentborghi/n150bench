@@ -251,7 +251,7 @@
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Click the checkbox next to any CPU to hide it (or Alt+Click to isolate). Reference CPU is highlighted in yellow and always kept visible. Windows 11 official support is indicated by [✓ W11] (supported) or [✗ W11] (unsupported).</p>
+  <p class="subtitle">Click the checkbox next to any CPU to hide it (or Alt+Click to isolate). Reference CPU is highlighted in yellow and always kept visible. Windows 11 compatibility: <span style="color: #16a34a; font-weight: 700;">[✓ W11]</span> (supported) / <span style="color: #dc2626; font-weight: 700;">[✗ W11]</span> (unsupported).</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
@@ -622,7 +622,7 @@
       }
     };
 
-    // Custom Chart.js plugin to draw interactive checkboxes between the CPU name and the histogram bars
+    // Custom Chart.js plugin to draw Windows 11 badges (green check / red cross) and row checkboxes
     const rowCheckboxesPlugin = {
       id: "rowCheckboxesPlugin",
       afterDraw(chartInstance) {
@@ -637,14 +637,67 @@
         for (let i = 0; i < currentLabels.length; i++) {
           const yCenter = yScale.getPixelForValue(i);
           const item = activeData[i];
-          const isRef = item && item.name === currentRefName;
-
-          // Checkbox coordinates: to the right of the CPU name, left of the bars
-          const cbX = xScale.left - 21;
-          const cbY = Math.round(yCenter - 7);
-          const cbSize = 14;
+          if (!item) continue;
+          const isRef = item.name === currentRefName;
 
           ctx.save();
+
+          // 1. Draw Windows 11 badge with green checkmark or red cross
+          const badgeX = xScale.left - 67;
+          const badgeY = Math.round(yCenter - 8);
+          const badgeW = 43;
+          const badgeH = 16;
+
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 3);
+          } else {
+            ctx.rect(badgeX, badgeY, badgeW, badgeH);
+          }
+
+          ctx.textBaseline = "middle";
+          ctx.textAlign = "left";
+
+          if (item.win11) {
+            // Supported: soft green background, border, and vivid green checkmark
+            ctx.fillStyle = "#ecfdf5";
+            ctx.strokeStyle = "#86efac";
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            // Green checkmark
+            ctx.fillStyle = "#16a34a";
+            ctx.font = "bold 11px sans-serif";
+            ctx.fillText("✓", badgeX + 4.5, yCenter);
+
+            // Dark green text
+            ctx.fillStyle = "#15803d";
+            ctx.font = "700 9px sans-serif";
+            ctx.fillText("W11", badgeX + 16, yCenter);
+          } else {
+            // Unsupported: soft red background, border, and vivid red cross
+            ctx.fillStyle = "#fef2f2";
+            ctx.strokeStyle = "#fca5a5";
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            // Red cross
+            ctx.fillStyle = "#dc2626";
+            ctx.font = "bold 11px sans-serif";
+            ctx.fillText("✗", badgeX + 4.5, yCenter);
+
+            // Dark red text
+            ctx.fillStyle = "#b91c1c";
+            ctx.font = "700 9px sans-serif";
+            ctx.fillText("W11", badgeX + 16, yCenter);
+          }
+
+          // 2. Draw Checkbox: to the right of W11 badge, left of the histogram bars
+          const cbX = xScale.left - 18;
+          const cbY = Math.round(yCenter - 7);
+          const cbSize = 14;
 
           if (isRef) {
             // Reference CPU checkbox: golden yellow, locked
@@ -728,12 +781,8 @@
 
     function updateChart() {
       const activeData = getFilteredAndSortedData();
-      // Dynamically append (Ref) and [✓ W11] / [✗ W11] to labels
-      const labels = activeData.map(item => {
-        const isRef = item.name === currentRefName;
-        const w11Badge = item.win11 ? "[✓ W11]" : "[✗ W11]";
-        return `${item.name}${isRef ? " (Ref)" : ""}  ${w11Badge}`;
-      });
+      // Dynamically append (Ref) to current reference CPU (W11 badge is rendered in color via canvas plugin)
+      const labels = activeData.map(item => item.name === currentRefName ? item.name + " (Ref)" : item.name);
 
       // Read current sort selection
       const sortVal = document.getElementById("sortSelect").value;
@@ -864,7 +913,7 @@
               y: {
                 grid: { display: false },
                 ticks: {
-                  padding: 28, // Leave room between CPU name and vertical axis for the checkbox
+                  padding: 72, // Leave room for colored W11 badge and row checkbox
                   color: function(context) {
                     const currentLabels = context.chart ? context.chart.data.labels : labels;
                     const label = currentLabels ? currentLabels[context.index] : null;
@@ -897,9 +946,9 @@
           const yScale = chart.scales.y;
           if (!xScale || !yScale) return;
 
-          // Checkbox column hit zone: right of CPU name, left of bars
-          const cbLeft = xScale.left - 25;
-          const cbRight = xScale.left - 4;
+          // Checkbox column hit zone: right of W11 badge, left of bars
+          const cbLeft = xScale.left - 22;
+          const cbRight = xScale.left - 2;
 
           if (mouseX >= cbLeft && mouseX <= cbRight) {
             const currentLabels = chart.data.labels;
@@ -942,24 +991,41 @@
           const yScale = chart.scales.y;
           if (!xScale || !yScale) return;
 
-          const cbLeft = xScale.left - 25;
-          const cbRight = xScale.left - 4;
+          const cbLeft = xScale.left - 22;
+          const cbRight = xScale.left - 2;
+          const w11Left = xScale.left - 67;
+          const w11Right = xScale.left - 24;
 
-          if (mouseX >= cbLeft && mouseX <= cbRight) {
-            const currentLabels = chart.data.labels;
-            const numRows = currentLabels.length;
-            const rowHeight = yScale.height / numRows;
+          const currentLabels = chart.data.labels;
+          const numRows = currentLabels.length;
+          const rowHeight = yScale.height / numRows;
 
-            for (let i = 0; i < numRows; i++) {
-              const yCenter = yScale.getPixelForValue(i);
-              if (mouseY >= yCenter - rowHeight / 2 && mouseY <= yCenter + rowHeight / 2) {
-                const currentData = getFilteredAndSortedData();
-                const hoveredItem = currentData[i];
-                if (hoveredItem && hoveredItem.name !== currentRefName) {
+          for (let i = 0; i < numRows; i++) {
+            const yCenter = yScale.getPixelForValue(i);
+            if (mouseY >= yCenter - rowHeight / 2 && mouseY <= yCenter + rowHeight / 2) {
+              const currentData = getFilteredAndSortedData();
+              const hoveredItem = currentData[i];
+              if (!hoveredItem) break;
+
+              // Hovering over the row checkbox
+              if (mouseX >= cbLeft && mouseX <= cbRight) {
+                if (hoveredItem.name !== currentRefName) {
                   canvas.style.cursor = "pointer";
                   canvas.title = `Click to hide ${hoveredItem.name} (Alt+Click to isolate)`;
-                  return;
+                } else {
+                  canvas.style.cursor = "default";
+                  canvas.title = "Reference CPU (permanently visible)";
                 }
+                return;
+              }
+
+              // Hovering over the Windows 11 badge
+              if (mouseX >= w11Left && mouseX <= w11Right) {
+                canvas.style.cursor = "help";
+                canvas.title = hoveredItem.win11
+                  ? "Windows 11: Officially supported by Microsoft"
+                  : "Windows 11: Not officially supported by Microsoft";
+                return;
               }
             }
           }
