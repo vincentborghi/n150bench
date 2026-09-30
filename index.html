@@ -251,7 +251,7 @@
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Click the checkbox next to any CPU to hide it (or Alt+Click to isolate). Reference CPU is highlighted in yellow and always kept visible.</p>
+  <p class="subtitle">Click the checkbox next to any CPU to hide it (or Alt+Click to isolate). Reference CPU is highlighted in yellow and always kept visible. Windows 11 official support is indicated by [✓ W11] (supported) or [✗ W11] (unsupported).</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
@@ -276,6 +276,15 @@
         <option value="gb6Single-desc">Geekbench 6 Single (Descending)</option>
         <option value="name-asc">Processor Name (A to Z)</option>
         <option value="name-desc">Processor Name (Z to A)</option>
+      </select>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="win11Select">Windows 11:</label>
+      <select id="win11Select" onchange="updateChart()">
+        <option value="all">All CPUs</option>
+        <option value="supported">Supported only (✓ W11)</option>
+        <option value="unsupported">Unsupported only (✗ W11)</option>
       </select>
     </div>
 
@@ -328,49 +337,50 @@
 
   <script>
     const cpuData = [
-      { name: "Intel Core i3-4030U", passmark: 1900, gb6Multi: 1250, gb6Single: 580 },
-      { name: "Intel Core i5-4250U", passmark: 2150, gb6Multi: 1450, gb6Single: 780 },
-      { name: "Intel Pentium Silver N5030", passmark: 2600, gb6Multi: 1600, gb6Single: 480 },
-      { name: "Intel Core i5-4310U", passmark: 2650, gb6Multi: 1550, gb6Single: 860 },
-      { name: "Intel Core i5-8210Y", passmark: 2700, gb6Multi: 1700, gb6Single: 800 },
-      { name: "Intel Core i5-7Y54", passmark: 2890, gb6Multi: 1700, gb6Single: 900 },
-      { name: "Intel Celeron N5095", passmark: 4000, gb6Multi: 1450, gb6Single: 500 },
-      { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850 },
-      { name: "Intel Processor N95", passmark: 5300, gb6Multi: 2850, gb6Single: 1100 },
-      { name: "Intel Processor N150", passmark: 5350, gb6Multi: 2900, gb6Single: 1150 },
-      { name: "AMD Ryzen 3 3300U", passmark: 5600, gb6Multi: 2500, gb6Single: 970 },
-      { name: "Intel Processor N97", passmark: 5900, gb6Multi: 3050, gb6Single: 1200 },
-      { name: "Intel Core i5-8250U", passmark: 5900, gb6Multi: 3100, gb6Single: 980 },
-      { name: "Intel Core i5-8350U", passmark: 6100, gb6Multi: 3400, gb6Single: 1100 },
-      { name: "Intel Core i5-10310U", passmark: 6600, gb6Multi: 3400, gb6Single: 1100 },
-      { name: "AMD Ryzen 5 3500U", passmark: 6900, gb6Multi: 3100, gb6Single: 1050 },
-      { name: "Intel Core i3-10100T", passmark: 7350, gb6Multi: 4250, gb6Single: 1330 },
-      { name: "AMD Ryzen 3 4300U", passmark: 7400, gb6Multi: 3400, gb6Single: 1100 },
-      { name: "Intel Core i7-1065G7", passmark: 8300, gb6Multi: 4100, gb6Single: 1200 },
-      { name: "AMD Ryzen 3 5300U ES", passmark: 8800, gb6Multi: 4600, gb6Single: 1300 },
-      { name: "Intel Core 3 N355", passmark: 9500, gb6Multi: 4800, gb6Single: 1300 },
-      { name: "AMD Ryzen 3 7330U", passmark: 10000, gb6Multi: 5200, gb6Single: 1750 },
-      { name: "Intel Core i5-1145G7", passmark: 10100, gb6Multi: 5000, gb6Single: 1450 },
-      { name: "Intel Core i5-10500T", passmark: 10250, gb6Multi: 4750, gb6Single: 1310 },
-      { name: "AMD Ryzen 5 4500U", passmark: 11000, gb6Multi: 4500, gb6Single: 1150 },
-      { name: "AMD Ryzen 3 5425U", passmark: 11200, gb6Multi: 5800, gb6Single: 1650 },
-      { name: "Intel Core i3-1215U", passmark: 11200, gb6Multi: 5200, gb6Single: 1650 },
-      { name: "AMD Ryzen 7 4700U ES", passmark: 12500, gb6Multi: 5300, gb6Single: 1350 },
-      { name: "AMD Ryzen 5 5500U", passmark: 13000, gb6Multi: 5500, gb6Single: 1200 },
-      { name: "Intel Core i5-1345U", passmark: 13850, gb6Multi: 8000, gb6Single: 2200 },
-      { name: "Intel Core 7 150U", passmark: 14700, gb6Multi: 8300, gb6Single: 2400 },
-      { name: "Intel Core i9-10980HK", passmark: 15000, gb6Multi: 8500, gb6Single: 1650 },
-      { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400 },
-      { name: "AMD Ryzen 5 7430U", passmark: 16000, gb6Multi: 6700, gb6Single: 1900 },
-      { name: "AMD Ryzen 5 7530U", passmark: 16200, gb6Multi: 6200, gb6Single: 1900 },
-      { name: "AMD Ryzen 5 PRO 6650H", passmark: 18600, gb6Multi: 8150, gb6Single: 1880 },
-      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950 },
-      { name: "AMD Ryzen 5 6600H", passmark: 19000, gb6Multi: 7200, gb6Single: 1450 },
-      { name: "AMD Ryzen 7 5800H", passmark: 20500, gb6Multi: 8400, gb6Single: 2050 },
-      { name: "AMD Ryzen 5 7640HS", passmark: 22700, gb6Multi: 10000, gb6Single: 2470 },
-      { name: "AMD Ryzen 7 7735HS", passmark: 24000, gb6Multi: 11000, gb6Single: 1800 },
-      { name: "AMD Ryzen 7 5700G", passmark: 24200, gb6Multi: 9200, gb6Single: 1900 },
-      { name: "AMD Ryzen 7 8845HS", passmark: 28300, gb6Multi: 12500, gb6Single: 2650 }
+      { name: "Intel Core i3-4030U", passmark: 1900, gb6Multi: 1250, gb6Single: 580, win11: false },
+      { name: "Intel Core i5-4250U", passmark: 2150, gb6Multi: 1450, gb6Single: 780, win11: false },
+      { name: "Intel Pentium Silver N5030", passmark: 2600, gb6Multi: 1600, gb6Single: 480, win11: true },
+      { name: "Intel Core i5-4310U", passmark: 2650, gb6Multi: 1550, gb6Single: 860, win11: false },
+      { name: "Intel Core i5-8210Y", passmark: 2700, gb6Multi: 1700, gb6Single: 800, win11: true },
+      { name: "Intel Core i5-7Y54", passmark: 2890, gb6Multi: 1700, gb6Single: 900, win11: false },
+      { name: "Intel Celeron N5095", passmark: 4000, gb6Multi: 1450, gb6Single: 500, win11: false },
+      { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850, win11: false },
+      { name: "Intel Processor N95", passmark: 5300, gb6Multi: 2850, gb6Single: 1100, win11: true },
+      { name: "Intel Processor N150", passmark: 5350, gb6Multi: 2900, gb6Single: 1150, win11: true },
+      { name: "AMD Ryzen 3 3300U", passmark: 5600, gb6Multi: 2500, gb6Single: 970, win11: false },
+      { name: "Intel Processor N97", passmark: 5900, gb6Multi: 3050, gb6Single: 1200, win11: true },
+      { name: "Intel Core i5-8250U", passmark: 5900, gb6Multi: 3100, gb6Single: 980, win11: true },
+      { name: "Intel Core i5-8350U", passmark: 6100, gb6Multi: 3400, gb6Single: 1100, win11: true },
+      { name: "Intel Core i5-10310U", passmark: 6600, gb6Multi: 3400, gb6Single: 1100, win11: true },
+      { name: "AMD Ryzen 5 3500U", passmark: 6900, gb6Multi: 3100, gb6Single: 1050, win11: false },
+      { name: "Intel Core i3-10100T", passmark: 7350, gb6Multi: 4250, gb6Single: 1330, win11: true },
+      { name: "AMD Ryzen 3 4300U", passmark: 7400, gb6Multi: 3400, gb6Single: 1100, win11: true },
+      { name: "Intel Core i7-1065G7", passmark: 8300, gb6Multi: 4100, gb6Single: 1200, win11: true },
+      { name: "AMD Ryzen 3 5300U ES", passmark: 8800, gb6Multi: 4600, gb6Single: 1300, win11: true },
+      { name: "Intel Core 3 N355", passmark: 9500, gb6Multi: 4800, gb6Single: 1300, win11: true },
+      { name: "AMD Ryzen 3 7330U", passmark: 10000, gb6Multi: 5200, gb6Single: 1750, win11: true },
+      { name: "Intel Core i5-1145G7", passmark: 10100, gb6Multi: 5000, gb6Single: 1450, win11: true },
+      { name: "Intel Core i5-10500T", passmark: 10250, gb6Multi: 4750, gb6Single: 1310, win11: true },
+      { name: "AMD Ryzen 5 4500U", passmark: 11000, gb6Multi: 4500, gb6Single: 1150, win11: true },
+      { name: "AMD Ryzen 3 5425U", passmark: 11200, gb6Multi: 5800, gb6Single: 1650, win11: true },
+      { name: "Intel Core i3-1215U", passmark: 11200, gb6Multi: 5200, gb6Single: 1650, win11: true },
+      { name: "AMD Ryzen 7 4700U ES", passmark: 12500, gb6Multi: 5300, gb6Single: 1350, win11: true },
+      { name: "AMD Ryzen 5 5500U", passmark: 13000, gb6Multi: 5500, gb6Single: 1200, win11: true },
+      { name: "Intel Core i5-1345U", passmark: 13850, gb6Multi: 8000, gb6Single: 2200, win11: true },
+      { name: "Intel Core 7 150U", passmark: 14700, gb6Multi: 8300, gb6Single: 2400, win11: true },
+      { name: "Intel Core i9-10980HK", passmark: 15000, gb6Multi: 8500, gb6Single: 1650, win11: true },
+      { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400, win11: true },
+      { name: "AMD Ryzen 5 7430U", passmark: 16000, gb6Multi: 6700, gb6Single: 1900, win11: true },
+      { name: "AMD Ryzen 5 7530U", passmark: 16200, gb6Multi: 6200, gb6Single: 1900, win11: true },
+      { name: "AMD Ryzen 5 PRO 6650H", passmark: 18600, gb6Multi: 8150, gb6Single: 1880, win11: true },
+      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950, win11: true },
+      { name: "AMD Ryzen 5 6600H", passmark: 19000, gb6Multi: 7200, gb6Single: 1450, win11: true },
+      { name: "AMD Ryzen 7 5800H", passmark: 20500, gb6Multi: 8400, gb6Single: 2050, win11: true },
+      { name: "AMD Ryzen 5 7640HS", passmark: 22700, gb6Multi: 10000, gb6Single: 2470, win11: true },
+      { name: "AMD Ryzen 7 7735HS", passmark: 24000, gb6Multi: 11000, gb6Single: 1800, win11: true },
+      { name: "AMD Ryzen 7 5700G", passmark: 24200, gb6Multi: 9200, gb6Single: 1900, win11: true },
+      { name: "AMD Ryzen 7 8745HS", passmark: 28100, gb6Multi: 12300, gb6Single: 2500, win11: true },
+      { name: "AMD Ryzen 7 8845HS", passmark: 28300, gb6Multi: 12500, gb6Single: 2650, win11: true }
     ];
 
     // Reference CPU (Intel N150 by default, can be modified via UI)
@@ -392,7 +402,7 @@
       sortedCpus.forEach(cpu => {
         const opt = document.createElement("option");
         opt.value = cpu.name;
-        opt.textContent = cpu.name;
+        opt.textContent = `${cpu.name}  [${cpu.win11 ? "✓ W11" : "✗ W11"}]`;
         if (cpu.name === currentRefName) {
           opt.selected = true;
         }
@@ -421,6 +431,17 @@
     function unhideAll() {
       hiddenCpuNames.clear();
       document.getElementById("filterInput").value = "";
+      if (document.getElementById("win11Select")) {
+        document.getElementById("win11Select").value = "all";
+      }
+      updateChart();
+    }
+
+    function clearFilter() {
+      document.getElementById("filterInput").value = "";
+      if (document.getElementById("win11Select")) {
+        document.getElementById("win11Select").value = "all";
+      }
       updateChart();
     }
 
@@ -453,6 +474,7 @@
 
     function getFilteredAndSortedData() {
       const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
+      const win11Filter = document.getElementById("win11Select") ? document.getElementById("win11Select").value : "all";
 
       let result = cpuData.filter(item => {
         // The current reference CPU is permanently kept visible
@@ -460,6 +482,10 @@
 
         // Check if CPU has been manually hidden
         if (hiddenCpuNames.has(item.name)) return false;
+
+        // Check Windows 11 compatibility filter
+        if (win11Filter === "supported" && !item.win11) return false;
+        if (win11Filter === "unsupported" && item.win11) return false;
 
         // Check if matches text filter
         if (!filterText) return true;
@@ -695,8 +721,12 @@
 
     function updateChart() {
       const activeData = getFilteredAndSortedData();
-      // Dynamically append (Ref) to whichever CPU is currently the reference
-      const labels = activeData.map(item => item.name === currentRefName ? item.name + " (Ref)" : item.name);
+      // Dynamically append (Ref) and [✓ W11] / [✗ W11] to labels
+      const labels = activeData.map(item => {
+        const isRef = item.name === currentRefName;
+        const w11Badge = item.win11 ? "[✓ W11]" : "[✗ W11]";
+        return `${item.name}${isRef ? " (Ref)" : ""}  ${w11Badge}`;
+      });
 
       // Read current sort selection
       const sortVal = document.getElementById("sortSelect").value;
@@ -797,11 +827,23 @@
                     if (datasetKey === "gb6Single") refVal = currentRefObj.gb6Single;
 
                     const label = context.chart.data.labels[context.dataIndex];
+                    const activeData = getFilteredAndSortedData();
+                    const currentItem = activeData[context.dataIndex];
+
+                    const lines = [];
                     if (isRefLabel(label)) {
-                      return `Reference CPU (${currentRefName})`;
+                      lines.push(`Reference CPU (${currentRefName})`);
+                    } else {
+                      const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
+                      lines.push((diff > 0 ? "+" : "") + diff + `% vs ${currentRefName}`);
                     }
-                    const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
-                    return (diff > 0 ? "+" : "") + diff + `% vs ${currentRefName}`;
+
+                    if (currentItem) {
+                      lines.push(currentItem.win11
+                        ? "Windows 11: Officially supported by Microsoft"
+                        : "Windows 11: Not officially supported by Microsoft");
+                    }
+                    return lines;
                   }
                 }
               }
