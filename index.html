@@ -349,6 +349,7 @@
 
   <script>
     const cpuData = [
+      { name: "Intel Celeron J3355", passmark: 1250, gb6Multi: 540, gb6Single: 300, win11: false, ram: ["DDR3"], ramDesc: "DDR3L-1866 / LPDDR4-2400 (Dual Channel)" },
       { name: "Intel Core i3-4030U", passmark: 1900, gb6Multi: 1250, gb6Single: 580, win11: false, ram: ["DDR3"], ramDesc: "DDR3L-1600 / LPDDR3-1600 (Dual Channel)" },
       { name: "Intel Celeron N4505", passmark: 2050, gb6Multi: 1250, gb6Single: 680, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2933 / LPDDR4x-2933 (Dual Channel)" },
       { name: "Intel Core i5-4250U", passmark: 2150, gb6Multi: 1450, gb6Single: 780, win11: false, ram: ["DDR3"], ramDesc: "DDR3L-1600 / LPDDR3-1600 (Dual Channel)" },
@@ -359,6 +360,7 @@
       { name: "Intel Core i3-10110U", passmark: 3600, gb6Multi: 2200, gb6Single: 1050, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2666 / LPDDR4-2933 (Dual Channel)" },
       { name: "Intel Celeron N5095", passmark: 4000, gb6Multi: 1450, gb6Single: 500, win11: false, ram: ["DDR4"], ramDesc: "DDR4-2933 / LPDDR4x-2933 (Dual Channel)" },
       { name: "Intel Core i5-6500T", passmark: 4800, gb6Multi: 2400, gb6Single: 850, win11: false, ram: ["DDR4"], ramDesc: "DDR4-2133 / DDR3L-1600 (Dual Channel)" },
+      { name: "Intel Pentium Gold 7505", passmark: 5150, gb6Multi: 2900, gb6Single: 1450, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4x-3733 (Dual Channel)" },
       { name: "Intel Processor N95", passmark: 5300, gb6Multi: 2850, gb6Single: 1100, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 (Single Channel)" },
       { name: "Intel Processor N150", passmark: 5350, gb6Multi: 2900, gb6Single: 1150, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 (Single Channel)" },
       { name: "Intel Processor N100", passmark: 5500, gb6Multi: 2950, gb6Single: 1150, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 (Single Channel)" },
@@ -390,11 +392,14 @@
       { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4x-4266 (Dual Channel)" },
       { name: "AMD Ryzen 5 7430U", passmark: 16000, gb6Multi: 6700, gb6Single: 1900, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 (Dual Channel)" },
       { name: "AMD Ryzen 5 7530U", passmark: 16200, gb6Multi: 6200, gb6Single: 1900, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 (Dual Channel)" },
+      { name: "Intel Core i5-12450H", passmark: 17100, gb6Multi: 8600, gb6Single: 2250, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 / LPDDR5-5200 (Dual Channel)" },
       { name: "Intel Core Ultra 5 125U", passmark: 17300, gb6Multi: 9200, gb6Single: 2150, win11: true, ram: ["DDR5"], ramDesc: "DDR5-5600 / LPDDR5x-7467 (Dual Channel)" },
       { name: "AMD Ryzen 5 PRO 6650H", passmark: 18600, gb6Multi: 8150, gb6Single: 1880, win11: true, ram: ["DDR5"], ramDesc: "DDR5-4800 / LPDDR5-6400 (Dual Channel)" },
-      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 (Dual Channel)" },
       { name: "AMD Ryzen 5 6600H", passmark: 19000, gb6Multi: 7200, gb6Single: 1450, win11: true, ram: ["DDR5"], ramDesc: "DDR5-4800 / LPDDR5-6400 (Dual Channel)" },
+      { name: "AMD Ryzen 7 7730U", passmark: 19000, gb6Multi: 7800, gb6Single: 1920, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4x-4266 (Dual Channel)" },
+      { name: "AMD Ryzen 5 5500GT", passmark: 19100, gb6Multi: 8200, gb6Single: 1950, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 (Dual Channel)" },
       { name: "AMD Ryzen 7 5800H", passmark: 20500, gb6Multi: 8400, gb6Single: 2050, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4-4266 (Dual Channel)" },
+      { name: "Intel Core i5-12500H", passmark: 21200, gb6Multi: 10800, gb6Single: 2350, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 / LPDDR5-5200 (Dual Channel)" },
       { name: "AMD Ryzen 5 7640HS", passmark: 22700, gb6Multi: 10000, gb6Single: 2470, win11: true, ram: ["DDR5"], ramDesc: "DDR5-5600 / LPDDR5x-7500 (Dual Channel)" },
       { name: "AMD Ryzen 7 7735HS", passmark: 24000, gb6Multi: 11000, gb6Single: 1800, win11: true, ram: ["DDR5"], ramDesc: "DDR5-4800 / LPDDR5-6400 (Dual Channel)" },
       { name: "AMD Ryzen 7 5700G", passmark: 24200, gb6Multi: 9200, gb6Single: 1900, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 (Dual Channel)" },
