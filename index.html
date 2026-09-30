@@ -30,7 +30,7 @@
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       position: relative;
-      height: 1150px;
+      height: 1400px;
     }
   </style>
 </head>
@@ -46,6 +46,9 @@
   <script>
     const labels = [
       "Intel Core i3-4030U",
+      "Intel Core i5-4250U",
+      "Intel Pentium Silver N5030",
+      "Intel Core i5-4310U",
       "Intel Core i5-6500T",
       "Intel Processor N95",
       "Intel Processor N150 (Ref)",
@@ -55,12 +58,14 @@
       "AMD Ryzen 3 4300U",
       "Intel Core i7-1065G7",
       "AMD Ryzen 3 5300U ES",
+      "AMD Ryzen 3 7330U",
       "Intel Core i5-1145G7",
       "AMD Ryzen 5 4500U",
       "AMD Ryzen 3 5425U",
       "Intel Core i3-1215U",
       "AMD Ryzen 7 4700U ES",
       "AMD Ryzen 5 5500U",
+      "Intel Core i9-10980HK",
       "AMD Ryzen 5 5600U",
       "AMD Ryzen 5 7530U",
       "AMD Ryzen 5 6600H",
@@ -83,6 +88,9 @@
         label: "PassMark CPU Mark (Multi-Thread)",
         data: [
           1900,  // i3-4030U
+          2150,  // i5-4250U
+          2600,  // N5030
+          2650,  // i5-4310U
           4800,  // i5-6500T
           5300,  // N95
           5350,  // N150
@@ -92,12 +100,14 @@
           7400,  // Ryzen 3 4300U
           8300,  // i7-1065G7
           8800,  // Ryzen 3 5300U ES
+          10000, // Ryzen 3 7330U
           10100, // i5-1145G7
           11000, // Ryzen 5 4500U
           11200, // Ryzen 3 5425U
           11200, // i3-1215U
           12500, // Ryzen 7 4700U ES
           13000, // Ryzen 5 5500U
+          15000, // i9-10980HK
           15500, // Ryzen 5 5600U
           16200, // Ryzen 5 7530U
           19000, // Ryzen 5 6600H
@@ -112,6 +122,9 @@
         label: "Geekbench 6 (Multi-Core)",
         data: [
           1250,  // i3-4030U
+          1450,  // i5-4250U
+          1600,  // N5030
+          1550,  // i5-4310U
           2400,  // i5-6500T
           2850,  // N95
           2900,  // N150
@@ -121,12 +134,14 @@
           3400,  // Ryzen 3 4300U
           4100,  // i7-1065G7
           4600,  // Ryzen 3 5300U ES
+          5200,  // Ryzen 3 7330U
           5000,  // i5-1145G7
           4500,  // Ryzen 5 4500U
           5800,  // Ryzen 3 5425U
           5200,  // i3-1215U
           5300,  // Ryzen 7 4700U ES
           5500,  // Ryzen 5 5500U
+          8500,  // i9-10980HK
           6500,  // Ryzen 5 5600U
           6200,  // Ryzen 5 7530U
           7200,  // Ryzen 5 6600H
@@ -141,6 +156,9 @@
         label: "Geekbench 6 (Single-Core)",
         data: [
           580,   // i3-4030U
+          780,   // i5-4250U
+          480,   // N5030
+          860,   // i5-4310U
           850,   // i5-6500T
           1100,  // N95
           1150,  // N150
@@ -150,12 +168,14 @@
           1100,  // Ryzen 3 4300U
           1200,  // i7-1065G7
           1300,  // Ryzen 3 5300U ES
+          1750,  // Ryzen 3 7330U
           1450,  // i5-1145G7
           1150,  // Ryzen 5 4500U
           1650,  // Ryzen 3 5425U
           1650,  // i3-1215U
           1350,  // Ryzen 7 4700U ES
           1200,  // Ryzen 5 5500U
+          1650,  // i9-10980HK
           1400,  // Ryzen 5 5600U
           1900,  // Ryzen 5 7530U
           1450,  // Ryzen 5 6600H
