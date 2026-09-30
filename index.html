@@ -395,9 +395,6 @@
           ctx.fillRect(4, top + 3, labelAreaWidth, rowHeight - 6);
         }
 
-        // Orange border indicator on the left edge of the chart area
-        ctx.fillStyle = "#ea580c";
-        ctx.fillRect(xScale.left - 4, top + 1, 4, rowHeight - 2);
         ctx.restore();
       }
     };
@@ -419,7 +416,7 @@
             if (val === undefined || val === null) return;
 
             const isRef = chartInstance.data.labels[index] && isRefLabel(chartInstance.data.labels[index]);
-            ctx.fillStyle = isRef ? "#9a3412" : "#475569";
+            ctx.fillStyle = isRef ? "#0f172a" : "#475569";
             ctx.font = isRef ? "bold 11px sans-serif" : "600 10px sans-serif";
 
             const formatted = val.toLocaleString("en-US");
@@ -434,7 +431,6 @@
     function updateChart() {
       const activeData = getFilteredAndSortedData();
       const labels = activeData.map(item => item.name);
-      const isRefArray = activeData.map(item => item.isRef);
 
       // Read current sort selection
       const sortVal = document.getElementById("sortSelect").value;
@@ -461,10 +457,6 @@
       const chartBox = document.getElementById("chartBox");
       chartBox.style.height = targetHeight + "px";
 
-      // Enhanced styling for the reference processor
-      const borderColors = isRefArray.map(ref => (ref ? "#b45309" : "transparent"));
-      const borderWidths = isRefArray.map(ref => (ref ? 2.5 : 0));
-
       const datasets = [];
 
       if (showPassmark) {
@@ -472,9 +464,7 @@
           key: "passmark",
           label: "PassMark CPU Mark (Multi-Thread)" + (sortKey === "passmark" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.passmark),
-          backgroundColor: activeData.map(item => (item.isRef ? "#1d4ed8" : "#2563eb")),
-          borderColor: borderColors,
-          borderWidth: borderWidths,
+          backgroundColor: "#2563eb",
           borderRadius: 3
         });
       }
@@ -484,9 +474,7 @@
           key: "gb6Multi",
           label: "Geekbench 6 (Multi-Core)" + (sortKey === "gb6Multi" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Multi),
-          backgroundColor: activeData.map(item => (item.isRef ? "#6d28d9" : "#7c3aed")),
-          borderColor: borderColors,
-          borderWidth: borderWidths,
+          backgroundColor: "#7c3aed",
           borderRadius: 3
         });
       }
@@ -496,9 +484,7 @@
           key: "gb6Single",
           label: "Geekbench 6 (Single-Core)" + (sortKey === "gb6Single" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Single),
-          backgroundColor: activeData.map(item => (item.isRef ? "#047857" : "#059669")),
-          borderColor: borderColors,
-          borderWidth: borderWidths,
+          backgroundColor: "#059669",
           borderRadius: 3
         });
       }
