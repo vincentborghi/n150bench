@@ -289,11 +289,11 @@
     <div id="hiddenChipsContainer" style="display: inline-flex; flex-wrap: wrap; gap: 6px;"></div>
   </div>
 
-  <!-- Benchmark indicators with radio button (solo metric), checkbox (toggle metric), and click to sort -->
+  <!-- Benchmark indicators with radio button (solo metric + sort asc), checkbox (toggle metric), and click to sort -->
   <div class="benchmark-indicators">
     <div class="benchmark-card" id="card-passmark" onclick="toggleMetricSort('passmark')">
       <div class="benchmark-card-left">
-        <input type="radio" id="radio-passmark" name="metricRadio" onclick="event.stopPropagation(); handleRadioClick('passmark')" title="Show only PassMark (click again to restore all)">
+        <input type="radio" id="radio-passmark" name="metricRadio" onclick="event.stopPropagation(); handleRadioClick('passmark')" title="Show only PassMark and sort ascending">
         <input type="checkbox" id="chk-passmark" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle PassMark visibility">
         <div class="color-swatch swatch-passmark"></div>
         <span class="benchmark-name">PassMark (Multi-Thread)</span>
@@ -303,7 +303,7 @@
 
     <div class="benchmark-card" id="card-gb6Multi" onclick="toggleMetricSort('gb6Multi')">
       <div class="benchmark-card-left">
-        <input type="radio" id="radio-gb6Multi" name="metricRadio" onclick="event.stopPropagation(); handleRadioClick('gb6Multi')" title="Show only Geekbench 6 Multi (click again to restore all)">
+        <input type="radio" id="radio-gb6Multi" name="metricRadio" onclick="event.stopPropagation(); handleRadioClick('gb6Multi')" title="Show only Geekbench 6 Multi and sort ascending">
         <input type="checkbox" id="chk-gb6Multi" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle Geekbench 6 Multi visibility">
         <div class="color-swatch swatch-gb6m"></div>
         <span class="benchmark-name">Geekbench 6 (Multi-Core)</span>
@@ -313,7 +313,7 @@
 
     <div class="benchmark-card" id="card-gb6Single" onclick="toggleMetricSort('gb6Single')">
       <div class="benchmark-card-left">
-        <input type="radio" id="radio-gb6Single" name="metricRadio" onclick="event.stopPropagation(); handleRadioClick('gb6Single')" title="Show only Geekbench 6 Single (click again to restore all)">
+        <input type="radio" id="radio-gb6Single" name="metricRadio" onclick="event.stopPropagation(); handleRadioClick('gb6Single')" title="Show only Geekbench 6 Single and sort ascending">
         <input type="checkbox" id="chk-gb6Single" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle Geekbench 6 Single visibility">
         <div class="color-swatch swatch-gb6s"></div>
         <span class="benchmark-name">Geekbench 6 (Single-Core)</span>
@@ -490,22 +490,16 @@
       const chkP = document.getElementById("chk-passmark");
       const chkM = document.getElementById("chk-gb6Multi");
       const chkS = document.getElementById("chk-gb6Single");
+      const sortSelect = document.getElementById("sortSelect");
 
-      const isAlreadyIsolated = (
-        (metricKey === "passmark" && chkP.checked && !chkM.checked && !chkS.checked) ||
-        (metricKey === "gb6Multi" && !chkP.checked && chkM.checked && !chkS.checked) ||
-        (metricKey === "gb6Single" && !chkP.checked && !chkM.checked && chkS.checked)
-      );
+      // Isolate selected benchmark metric
+      chkP.checked = (metricKey === "passmark");
+      chkM.checked = (metricKey === "gb6Multi");
+      chkS.checked = (metricKey === "gb6Single");
 
-      if (isAlreadyIsolated) {
-        // Toggle back: restore all 3 metrics
-        chkP.checked = true;
-        chkM.checked = true;
-        chkS.checked = true;
-      } else {
-        chkP.checked = (metricKey === "passmark");
-        chkM.checked = (metricKey === "gb6Multi");
-        chkS.checked = (metricKey === "gb6Single");
+      // Automatically apply ascending sort on the selected benchmark
+      if (sortSelect) {
+        sortSelect.value = metricKey + "-asc";
       }
 
       updateChart();
