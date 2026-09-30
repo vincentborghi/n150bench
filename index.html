@@ -103,10 +103,22 @@
       border-color: #cbd5e1;
       transform: translateY(-1px);
     }
+    .benchmark-card.metric-disabled {
+      opacity: 0.45;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
     .benchmark-card-left {
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+    .benchmark-card input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #0284c7;
+      margin: 0;
     }
     .color-swatch {
       width: 14px;
@@ -174,7 +186,7 @@
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. The reference CPU (Intel N150) is highlighted in fluorescent yellow and always kept visible.</p>
+  <p class="subtitle">Simultaneous comparison across PassMark and Geekbench 6. Use checkboxes to show/hide metrics. The reference CPU (Intel N150) is highlighted in yellow and always kept visible.</p>
 
   <div class="toolbar">
     <div class="toolbar-group">
@@ -200,10 +212,11 @@
     <div class="badge-info" id="countInfo"></div>
   </div>
 
-  <!-- Benchmark indicators showing the active sort key -->
+  <!-- Benchmark indicators with checkboxes to toggle visibility and card clicks to sort -->
   <div class="benchmark-indicators">
     <div class="benchmark-card" id="card-passmark" onclick="toggleMetricSort('passmark')">
       <div class="benchmark-card-left">
+        <input type="checkbox" id="chk-passmark" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle PassMark visibility">
         <div class="color-swatch swatch-passmark"></div>
         <span class="benchmark-name">PassMark (Multi-Thread)</span>
       </div>
@@ -212,6 +225,7 @@
 
     <div class="benchmark-card" id="card-gb6Multi" onclick="toggleMetricSort('gb6Multi')">
       <div class="benchmark-card-left">
+        <input type="checkbox" id="chk-gb6Multi" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle Geekbench 6 Multi visibility">
         <div class="color-swatch swatch-gb6m"></div>
         <span class="benchmark-name">Geekbench 6 (Multi-Core)</span>
       </div>
@@ -220,6 +234,7 @@
 
     <div class="benchmark-card" id="card-gb6Single" onclick="toggleMetricSort('gb6Single')">
       <div class="benchmark-card-left">
+        <input type="checkbox" id="chk-gb6Single" checked onchange="handleCheckboxChange()" onclick="event.stopPropagation()" title="Toggle Geekbench 6 Single visibility">
         <div class="color-swatch swatch-gb6s"></div>
         <span class="benchmark-name">Geekbench 6 (Single-Core)</span>
       </div>
@@ -301,6 +316,19 @@
       updateChart();
     }
 
+    function handleCheckboxChange() {
+      const chkP = document.getElementById("chk-passmark");
+      const chkM = document.getElementById("chk-gb6Multi");
+      const chkS = document.getElementById("chk-gb6Single");
+
+      // Ensure at least one benchmark stays checked
+      if (!chkP.checked && !chkM.checked && !chkS.checked) {
+        chkP.checked = true;
+      }
+
+      updateChart();
+    }
+
     function toggleMetricSort(metricKey) {
       const sortSelect = document.getElementById("sortSelect");
       const currentVal = sortSelect.value;
@@ -317,7 +345,12 @@
       metrics.forEach(m => {
         const card = document.getElementById("card-" + m);
         const tag = document.getElementById("tag-" + m);
+        const chk = document.getElementById("chk-" + m);
+
         card.className = "benchmark-card";
+        if (!chk.checked) {
+          card.classList.add("metric-disabled");
+        }
 
         if (sortKey === m) {
           card.classList.add("active-sort-" + m);
@@ -387,8 +420,15 @@
           ? `Showing all ${totalCount} CPUs`
           : `Showing ${visibleCount} of ${totalCount} CPUs (N150 always pinned)`;
 
-      // Dynamically calculate container height based on number of visible CPUs
-      const targetHeight = Math.max(380, visibleCount * 54 + 80);
+      // Read checkbox visibility
+      const showPassmark = document.getElementById("chk-passmark").checked;
+      const showGb6Multi = document.getElementById("chk-gb6Multi").checked;
+      const showGb6Single = document.getElementById("chk-gb6Single").checked;
+
+      // Count active datasets to dynamically calibrate row height
+      const activeDatasetsCount = (showPassmark ? 1 : 0) + (showGb6Multi ? 1 : 0) + (showGb6Single ? 1 : 0);
+      const rowStep = Math.max(30, activeDatasetsCount * 18 + 12);
+      const targetHeight = Math.max(380, visibleCount * rowStep + 60);
       const chartBox = document.getElementById("chartBox");
       chartBox.style.height = targetHeight + "px";
 
@@ -396,32 +436,43 @@
       const borderColors = isRefArray.map(ref => (ref ? "#b45309" : "transparent"));
       const borderWidths = isRefArray.map(ref => (ref ? 2.5 : 0));
 
-      const datasets = [
-        {
+      const datasets = [];
+
+      if (showPassmark) {
+        datasets.push({
+          key: "passmark",
           label: "PassMark CPU Mark (Multi-Thread)" + (sortKey === "passmark" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.passmark),
           backgroundColor: activeData.map(item => (item.isRef ? "#1d4ed8" : "#2563eb")),
           borderColor: borderColors,
           borderWidth: borderWidths,
           borderRadius: 3
-        },
-        {
+        });
+      }
+
+      if (showGb6Multi) {
+        datasets.push({
+          key: "gb6Multi",
           label: "Geekbench 6 (Multi-Core)" + (sortKey === "gb6Multi" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Multi),
           backgroundColor: activeData.map(item => (item.isRef ? "#6d28d9" : "#7c3aed")),
           borderColor: borderColors,
           borderWidth: borderWidths,
           borderRadius: 3
-        },
-        {
+        });
+      }
+
+      if (showGb6Single) {
+        datasets.push({
+          key: "gb6Single",
           label: "Geekbench 6 (Single-Core)" + (sortKey === "gb6Single" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
           data: activeData.map(item => item.gb6Single),
           backgroundColor: activeData.map(item => (item.isRef ? "#047857" : "#059669")),
           borderColor: borderColors,
           borderWidth: borderWidths,
           borderRadius: 3
-        }
-      ];
+        });
+      }
 
       if (!chart) {
         const ctx = document.getElementById("cpuChart").getContext("2d");
@@ -438,22 +489,16 @@
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                display: true,
-                position: "top",
-                labels: {
-                  boxWidth: 16,
-                  padding: 16,
-                  font: { size: 12 }
-                }
+                display: false // Replaced with custom checkbox legend
               },
               tooltip: {
                 callbacks: {
                   afterLabel: function(context) {
                     const currentVal = context.raw;
-                    const datasetIdx = context.datasetIndex;
+                    const datasetKey = context.dataset.key;
                     let refVal = n150Ref.passmark;
-                    if (datasetIdx === 1) refVal = n150Ref.gb6Multi;
-                    if (datasetIdx === 2) refVal = n150Ref.gb6Single;
+                    if (datasetKey === "gb6Multi") refVal = n150Ref.gb6Multi;
+                    if (datasetKey === "gb6Single") refVal = n150Ref.gb6Single;
 
                     const label = context.chart.data.labels[context.dataIndex];
                     if (isRefLabel(label)) {
@@ -473,7 +518,6 @@
               y: {
                 grid: { display: false },
                 ticks: {
-                  // Direct check on chart.data.labels prevents stale index closures on sort/filter
                   color: function(context) {
                     const currentLabels = context.chart ? context.chart.data.labels : labels;
                     const label = currentLabels ? currentLabels[context.index] : null;
