@@ -402,6 +402,35 @@
       }
     };
 
+    // Custom Chart.js plugin to print benchmark score values at the end of each bar
+    const barValueLabelsPlugin = {
+      id: "barValueLabelsPlugin",
+      afterDatasetsDraw(chartInstance) {
+        const ctx = chartInstance.ctx;
+        ctx.save();
+        ctx.textBaseline = "middle";
+
+        chartInstance.data.datasets.forEach((dataset, datasetIdx) => {
+          const meta = chartInstance.getDatasetMeta(datasetIdx);
+          if (!meta || meta.hidden) return;
+
+          meta.data.forEach((bar, index) => {
+            const val = dataset.data[index];
+            if (val === undefined || val === null) return;
+
+            const isRef = chartInstance.data.labels[index] && isRefLabel(chartInstance.data.labels[index]);
+            ctx.fillStyle = isRef ? "#9a3412" : "#475569";
+            ctx.font = isRef ? "bold 11px sans-serif" : "600 10px sans-serif";
+
+            const formatted = val.toLocaleString("en-US");
+            ctx.fillText(formatted, bar.x + 5, bar.y);
+          });
+        });
+
+        ctx.restore();
+      }
+    };
+
     function updateChart() {
       const activeData = getFilteredAndSortedData();
       const labels = activeData.map(item => item.name);
@@ -482,7 +511,7 @@
             labels: labels,
             datasets: datasets
           },
-          plugins: [highlightRefPlugin],
+          plugins: [highlightRefPlugin, barValueLabelsPlugin],
           options: {
             indexAxis: "y",
             responsive: true,
@@ -513,6 +542,7 @@
             scales: {
               x: {
                 beginAtZero: true,
+                grace: "8%",
                 grid: { color: "#e2e8f0" }
               },
               y: {
