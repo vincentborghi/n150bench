@@ -55,8 +55,8 @@ def is_intel_cpu_supported(name):
         return True, "Gemini Lake Refresh Pentium Silver (supported)"
     if "8210Y" in name:
         return True, "8th Gen Amber Lake Y (supported)"
-    if "8250U" in name or "8350U" in name:
-        return True, "8th Gen Kaby Lake R (supported)"
+    if any(k in name for k in ["8250U", "8350U", "8565U"]):
+        return True, "8th Gen Kaby Lake R / Whiskey Lake (supported)"
     if any(k in name for k in ["10110U", "10100T", "10310U", "10500T", "1065G7", "10980HK"]):
         return True, "10th Gen Comet Lake / Ice Lake (supported)"
     if any(k in name for k in ["7505", "1145G7"]):
