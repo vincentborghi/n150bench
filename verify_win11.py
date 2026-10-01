@@ -61,7 +61,7 @@ def is_intel_cpu_supported(name):
         return True, "10th Gen Comet Lake / Ice Lake (supported)"
     if any(k in name for k in ["7505", "1145G7"]):
         return True, "11th Gen Tiger Lake / Pentium Gold (supported)"
-    if any(k in name for k in ["1215U", "12450H", "12500H", "12700H"]):
+    if any(k in name for k in ["1215U", "1220P", "12450H", "12500H", "12700H"]):
         return True, "12th Gen Alder Lake (supported)"
     if "1345U" in name:
         return True, "13th Gen Raptor Lake (supported)"
@@ -134,7 +134,7 @@ def run_verification(args):
         for m in mismatches:
             print(f"  * {m['name']}: HTML={m['html']} != Expected={m['expected']} ({m['reason']})")
     else:
-        print("ALL 59 CPUs in index.html PERFECTLY MATCH official Microsoft Windows 11 requirements!")
+        print(f"ALL {len(cpus)} CPUs in index.html PERFECTLY MATCH official Microsoft Windows 11 requirements!")
     print("=" * 60)
 
 def build_parser():

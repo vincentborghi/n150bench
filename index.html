@@ -240,7 +240,7 @@
     }
     .chart-container {
       background: #ffffff;
-      padding: 16px;
+      padding: 0 14px 10px 14px;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       position: relative;
@@ -254,11 +254,11 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 10px 14px;
+      padding: 8px 14px;
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
     .selection-bar-left {
@@ -352,6 +352,32 @@
       background: #4338ca;
       border-color: #4338ca;
     }
+    .selection-search-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 6px;
+      padding-left: 8px;
+      border-left: 1px solid #e2e8f0;
+    }
+    .selection-search-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    .selection-search-input {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      outline: none;
+      width: 140px;
+      transition: all 0.15s ease;
+    }
+    .selection-search-input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+    }
   </style>
 </head>
 <body>
@@ -366,20 +392,14 @@
     </div>
 
     <div class="toolbar-group">
-      <label for="filterInput">Filter:</label>
-      <input type="text" id="filterInput" placeholder="Search by name..." oninput="updateChart()">
-      <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
-    </div>
-
-    <div class="toolbar-group">
       <label for="sortSelect">Sort by:</label>
       <select id="sortSelect" onchange="updateChart()">
+        <option value="gb6Single-asc" selected>Geekbench 6 Single (Ascending)</option>
+        <option value="gb6Single-desc">Geekbench 6 Single (Descending)</option>
         <option value="passmark-asc">PassMark Multi (Ascending)</option>
         <option value="passmark-desc">PassMark Multi (Descending)</option>
         <option value="gb6Multi-asc">Geekbench 6 Multi (Ascending)</option>
         <option value="gb6Multi-desc">Geekbench 6 Multi (Descending)</option>
-        <option value="gb6Single-asc">Geekbench 6 Single (Ascending)</option>
-        <option value="gb6Single-desc">Geekbench 6 Single (Descending)</option>
         <option value="name-asc">Processor Name (A to Z)</option>
         <option value="name-desc">Processor Name (Z to A)</option>
       </select>
@@ -442,7 +462,7 @@
     </div>
   </div>
 
-  <!-- In-histogram selection bar: batch actions + live counter + Apply & View -->
+  <!-- In-histogram selection bar: batch actions + text filter + live counter + Apply & View -->
   <div class="selection-bar" id="selectionBar">
     <div class="selection-bar-left">
       <span class="selection-bar-title">Selection:</span>
@@ -451,6 +471,13 @@
       <button type="button" class="sel-btn" id="btnSelW11" onclick="toggleSelectionFilter('w11')" title="Toggle Windows 11 filter (can be combined with RAM filters)">✓ W11 only</button>
       <button type="button" class="sel-btn" id="btnSelDdr4" onclick="toggleSelectionFilter('ddr4')" title="Toggle DDR4 filter (can be combined with W11 only)">DDR4</button>
       <button type="button" class="sel-btn" id="btnSelDdr5" onclick="toggleSelectionFilter('ddr5')" title="Toggle DDR5 filter (can be combined with W11 only)">DDR5</button>
+
+      <div class="selection-search-group">
+        <label for="filterInput" class="selection-search-label">Filter:</label>
+        <input type="text" id="filterInput" class="selection-search-input" placeholder="Search by name..." oninput="updateChart()">
+        <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
+      </div>
+
       <span class="selection-counter" id="selectionCounter"></span>
     </div>
     <div class="selection-bar-right">
@@ -505,6 +532,7 @@
       { name: "Intel Core Ultra 5 115U", passmark: 12500, gb6Multi: 7200, gb6Single: 2100, win11: true, ram: ["DDR5"], ramDesc: "DDR5-5600 / LPDDR5x-7467 (Dual Channel)" },
       { name: "AMD Ryzen 5 5500U", passmark: 13000, gb6Multi: 5500, gb6Single: 1200, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4-4266 (Dual Channel)" },
       { name: "Intel Core i5-1345U", passmark: 13850, gb6Multi: 8000, gb6Single: 2200, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-5200 / LPDDR5-6400 (Dual Channel)" },
+      { name: "Intel Core i3-1220P", passmark: 14500, gb6Multi: 7400, gb6Single: 1980, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 / LPDDR5-5200 (Dual Channel)" },
       { name: "Intel Core 7 150U", passmark: 14700, gb6Multi: 8300, gb6Single: 2400, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-5200 / LPDDR5-6400 (Dual Channel)" },
       { name: "Intel Core i9-10980HK", passmark: 15000, gb6Multi: 8500, gb6Single: 1650, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2933 (Dual Channel)" },
       { name: "AMD Ryzen 5 5600U", passmark: 15500, gb6Multi: 6500, gb6Single: 1400, win11: true, ram: ["DDR4"], ramDesc: "DDR4-3200 / LPDDR4x-4266 (Dual Channel)" },
@@ -1098,7 +1126,7 @@
       // Count active datasets to dynamically calibrate row height
       const activeDatasetsCount = (showPassmark ? 1 : 0) + (showGb6Multi ? 1 : 0) + (showGb6Single ? 1 : 0);
       const rowStep = Math.max(30, activeDatasetsCount * 18 + 12);
-      const targetHeight = Math.max(380, visibleCount * rowStep + 60);
+      const targetHeight = Math.max(300, visibleCount * rowStep + 26);
       const chartBox = document.getElementById("chartBox");
       chartBox.style.height = targetHeight + "px";
 
@@ -1159,6 +1187,14 @@
             indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+              padding: {
+                top: 0,
+                bottom: 2,
+                left: 0,
+                right: 8
+              }
+            },
             plugins: {
               legend: {
                 display: false
