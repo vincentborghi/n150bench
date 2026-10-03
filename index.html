@@ -262,6 +262,24 @@
       background: #e2e8f0;
       color: #0f172a;
     }
+    .sel-btn.active-intel {
+      background: #0284c7;
+      border-color: #0369a1;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(2, 132, 199, 0.3);
+    }
+    .sel-btn.active-intel:hover {
+      background: #0369a1;
+    }
+    .sel-btn.active-amd {
+      background: #dc2626;
+      border-color: #b91c1c;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(220, 38, 38, 0.3);
+    }
+    .sel-btn.active-amd:hover {
+      background: #b91c1c;
+    }
     .sel-btn.active-w11 {
       background: #16a34a;
       border-color: #15803d;
@@ -725,7 +743,9 @@
       <span class="selection-bar-title">Selection:</span>
       <button type="button" class="sel-btn" onclick="selectAllCpus()">Select All</button>
       <button type="button" class="sel-btn" onclick="deselectAllCpus()">Deselect All (Keep Refs)</button>
-      <button type="button" class="sel-btn" id="btnSelW11" onclick="toggleSelectionFilter('w11')" title="Toggle Windows 11 filter (can be combined with RAM filters)">✓ W11 only</button>
+      <button type="button" class="sel-btn" id="btnSelIntel" onclick="toggleSelectionFilter('intel')" title="Toggle Intel only filter (can be combined with other filters)">Intel only</button>
+      <button type="button" class="sel-btn" id="btnSelAmd" onclick="toggleSelectionFilter('amd')" title="Toggle AMD only filter (can be combined with other filters)">AMD only</button>
+      <button type="button" class="sel-btn" id="btnSelW11" onclick="toggleSelectionFilter('w11')" title="Toggle Windows 11 filter (can be combined with other filters)">✓ W11 only</button>
       <button type="button" class="sel-btn" id="btnSelDdr4" onclick="toggleSelectionFilter('ddr4')" title="Toggle DDR4 filter (can be combined with W11 only)">DDR4</button>
       <button type="button" class="sel-btn" id="btnSelDdr5" onclick="toggleSelectionFilter('ddr5')" title="Toggle DDR5 filter (can be combined with W11 only)">DDR5</button>
 
@@ -835,6 +855,7 @@
     let viewOnlyChecked = false;
 
     // Active selection filter toggle states
+    let selFilterBrand = "all"; // "all" | "intel" | "amd"
     let selFilterW11 = false;
     let selFilterDdr4 = false;
     let selFilterDdr5 = false;
@@ -911,6 +932,7 @@
     }
 
     function selectAllCpus() {
+      selFilterBrand = "all";
       selFilterW11 = false;
       selFilterDdr4 = false;
       selFilterDdr5 = false;
@@ -921,6 +943,7 @@
     }
 
     function deselectAllCpus() {
+      selFilterBrand = "all";
       selFilterW11 = false;
       selFilterDdr4 = false;
       selFilterDdr5 = false;
@@ -932,30 +955,44 @@
     }
 
     function toggleSelectionFilter(type) {
-      if (type === "w11") selFilterW11 = !selFilterW11;
-      if (type === "ddr4") selFilterDdr4 = !selFilterDdr4;
-      if (type === "ddr5") selFilterDdr5 = !selFilterDdr5;
+      if (type === "intel") {
+        selFilterBrand = (selFilterBrand === "intel") ? "all" : "intel";
+      } else if (type === "amd") {
+        selFilterBrand = (selFilterBrand === "amd") ? "all" : "amd";
+      } else if (type === "w11") {
+        selFilterW11 = !selFilterW11;
+      } else if (type === "ddr4") {
+        selFilterDdr4 = !selFilterDdr4;
+      } else if (type === "ddr5") {
+        selFilterDdr5 = !selFilterDdr5;
+      }
 
       updateSelectionFilterButtons();
       applySelectionFilters();
     }
 
     function updateSelectionFilterButtons() {
+      const btnIntel = document.getElementById("btnSelIntel");
+      const btnAmd = document.getElementById("btnSelAmd");
       const btnW11 = document.getElementById("btnSelW11");
       const btnDdr4 = document.getElementById("btnSelDdr4");
       const btnDdr5 = document.getElementById("btnSelDdr5");
 
+      if (btnIntel) btnIntel.classList.toggle("active-intel", selFilterBrand === "intel");
+      if (btnAmd) btnAmd.classList.toggle("active-amd", selFilterBrand === "amd");
       if (btnW11) btnW11.classList.toggle("active-w11", selFilterW11);
       if (btnDdr4) btnDdr4.classList.toggle("active-ddr4", selFilterDdr4);
       if (btnDdr5) btnDdr5.classList.toggle("active-ddr5", selFilterDdr5);
     }
 
     function applySelectionFilters() {
-      if (!selFilterW11 && !selFilterDdr4 && !selFilterDdr5) {
+      if (selFilterBrand === "all" && !selFilterW11 && !selFilterDdr4 && !selFilterDdr5) {
         checkedCpuNames = new Set(cpuData.map(c => c.name));
       } else {
         checkedCpuNames = new Set(referenceCpuNames);
         cpuData.forEach(cpu => {
+          if (selFilterBrand === "intel" && !cpu.name.toLowerCase().startsWith("intel")) return;
+          if (selFilterBrand === "amd" && !cpu.name.toLowerCase().startsWith("amd")) return;
           if (selFilterW11 && !cpu.win11) return;
 
           if (selFilterDdr4 || selFilterDdr5) {
