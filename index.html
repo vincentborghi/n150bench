@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CPU Benchmark - Interactive Comparison</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 20px auto;
-      max-width: 1060px;
+      max-width: 1100px;
       padding: 0 15px;
       color: #1e293b;
       background-color: #f8fafc;
@@ -22,19 +21,28 @@
       margin-top: 0;
       margin-bottom: 18px;
       color: #64748b;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      line-height: 1.45;
     }
+
+    /* Toolbar */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
-      padding: 12px 16px;
+      padding: 10px 16px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
+    }
+    .toolbar-left {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
     }
     .toolbar-group {
       display: flex;
@@ -43,113 +51,91 @@
       flex-wrap: wrap;
     }
     .toolbar-group label {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: #475569;
     }
-    input[type="text"], select {
-      padding: 7px 12px;
+    select {
+      padding: 6px 10px;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: #1e293b;
       background-color: #ffffff;
       outline: none;
       transition: border-color 0.15s ease;
     }
-    input[type="text"]:focus, select:focus {
+    select:focus {
       border-color: #0284c7;
     }
-    input[type="text"] {
-      width: 190px;
-    }
-    select.ref-select {
-      max-width: 230px;
-      font-weight: 600;
-      color: #854d0e;
-      background-color: #fefce8;
-      border-color: #facc15;
-    }
-    .clear-btn, .action-btn {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #334155;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 500;
-      transition: all 0.15s ease;
-    }
-    .clear-btn:hover, .action-btn:hover {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-    .action-btn.unhide-btn {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      font-weight: 600;
-    }
-    .action-btn.unhide-btn:hover {
-      background: #0369a1;
-    }
-    .badge-info {
-      font-size: 0.8rem;
-      color: #64748b;
-    }
-    /* Hidden CPUs Chips Container */
-    .hidden-cpus-bar {
+
+    /* Reference CPUs in Toolbar */
+    .ref-chips-container {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      background: #f1f5f9;
-      border: 1px dashed #cbd5e1;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      font-size: 0.82rem;
+      gap: 6px;
+      flex-wrap: wrap;
     }
-    .hidden-cpus-label {
-      font-weight: 600;
-      color: #475569;
-      margin-right: 4px;
-    }
-    .cpu-chip {
+    .ref-chip {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 3px 8px;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      color: #334155;
-      cursor: pointer;
+      padding: 3px 9px;
+      background: #fef08a;
+      border: 1px solid #ca8a04;
+      border-radius: 20px;
       font-size: 0.8rem;
-      transition: all 0.15s ease;
-    }
-    .cpu-chip:hover {
-      border-color: #0284c7;
-      color: #0284c7;
-      background: #eff6ff;
-    }
-    .cpu-chip .chip-plus {
       font-weight: 700;
-      color: #0284c7;
+      color: #854d0e;
+      box-shadow: 0 1px 2px rgba(202, 138, 4, 0.15);
     }
-    /* Benchmark indicators and active sort key highlight */
+    .ref-chip-star {
+      color: #ca8a04;
+      font-size: 0.85rem;
+    }
+    .ref-chip-close {
+      background: transparent;
+      border: none;
+      color: #a16207;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0 2px;
+      margin-left: 2px;
+      line-height: 1;
+      border-radius: 50%;
+    }
+    .ref-chip-close:hover {
+      color: #713f12;
+      background: rgba(0, 0, 0, 0.08);
+    }
+    .add-ref-select {
+      max-width: 220px;
+      font-size: 0.8rem;
+      padding: 5px 8px;
+      border: 1px dashed #ca8a04;
+      background: #fefce8;
+      color: #854d0e;
+      font-weight: 600;
+    }
+
+    .badge-info {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* Benchmark Indicators */
     .benchmark-indicators {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .benchmark-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
+      padding: 9px 14px;
       background: #ffffff;
       border: 2px solid #e2e8f0;
       border-radius: 8px;
@@ -171,13 +157,7 @@
       align-items: center;
       gap: 10px;
     }
-    .benchmark-card input[type="radio"] {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      accent-color: #0284c7;
-      margin: 0;
-    }
+    .benchmark-card input[type="radio"],
     .benchmark-card input[type="checkbox"] {
       width: 16px;
       height: 16px;
@@ -195,19 +175,18 @@
     .swatch-gb6m { background-color: #7c3aed; }
     .swatch-gb6s { background-color: #059669; }
     .benchmark-name {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: #334155;
     }
     .sort-tag {
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       padding: 2px 7px;
       border-radius: 4px;
       color: #64748b;
       background: #f1f5f9;
       font-weight: 500;
     }
-    /* Active sort key styling */
     .benchmark-card.active-sort-passmark {
       border-color: #2563eb;
       background: #eff6ff;
@@ -238,19 +217,8 @@
       color: #ffffff;
       font-weight: 700;
     }
-    .chart-container {
-      background: #ffffff;
-      padding: 0 14px 10px 14px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    #cpuChart {
-      display: block;
-      width: 100%;
-    }
 
-    /* In-histogram Selection Bar */
+    /* Selection Bar */
     .selection-bar {
       display: flex;
       flex-wrap: wrap;
@@ -261,7 +229,7 @@
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
     .selection-bar-left {
@@ -271,7 +239,7 @@
       gap: 8px;
     }
     .selection-bar-title {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
       color: #1e293b;
       margin-right: 4px;
@@ -331,9 +299,9 @@
       background: #0284c7;
       color: #ffffff;
       border: 1px solid #0284c7;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
-      padding: 7px 16px;
+      padding: 6px 14px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -381,52 +349,338 @@
       border-color: #0284c7;
       box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
     }
+    .clear-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+    .clear-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* Pure HTML/CSS Histogram Container */
+    .histogram-card {
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-top: 0;
+    }
+
+    /* Scale Ruler Header */
+    .hist-header {
+      display: flex;
+      align-items: stretch;
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #64748b;
+      user-select: none;
+    }
+    .hist-header-left {
+      width: 410px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 2px;
+    }
+    .hist-header-right {
+      flex: 1;
+      position: relative;
+      height: 20px;
+    }
+    .scale-tick {
+      position: absolute;
+      transform: translateX(-50%);
+      font-size: 0.74rem;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+    .scale-tick::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 5px;
+      background: #cbd5e1;
+    }
+
+    /* Histogram Rows */
+    .hist-rows {
+      display: flex;
+      flex-direction: column;
+    }
+    .hist-row {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 6px 12px;
+      background: #ffffff;
+      transition: background 0.12s ease;
+    }
+    .hist-row:last-child {
+      border-bottom: none;
+    }
+    .hist-row:hover {
+      background: #f8fafc;
+    }
+
+    /* Reference CPU Row Styling */
+    .hist-row.row-reference {
+      background-color: #fefce8 !important;
+      border-left: 4px solid #ca8a04;
+      box-shadow: inset 0 0 0 1px rgba(234, 179, 8, 0.2);
+    }
+    .hist-row.row-reference:hover {
+      background-color: #fef9c3 !important;
+    }
+
+    /* Dimmed Row (Unchecked CPU in Show All mode) */
+    .hist-row.row-dimmed {
+      opacity: 0.42;
+      filter: grayscale(35%);
+    }
+
+    /* Left Label Column */
+    .row-label {
+      width: 410px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding-right: 12px;
+    }
+    .row-chk {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: #0284c7;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .row-chk:disabled {
+      cursor: not-allowed;
+      accent-color: #ca8a04;
+    }
+    .row-pin-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 600;
+      flex-shrink: 0;
+      line-height: 1.4;
+      transition: all 0.12s ease;
+    }
+    .row-pin-btn:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .row-pin-btn.active {
+      background: #fef08a;
+      border-color: #ca8a04;
+      color: #854d0e;
+      font-weight: 700;
+      box-shadow: 0 1px 2px rgba(202, 138, 4, 0.2);
+    }
+    .row-name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #334155;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-reference .row-name {
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .ref-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #ca8a04;
+      color: #ffffff;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* RAM Badge */
+    .ram-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      text-align: center;
+      min-width: 44px;
+    }
+    .badge-ddr5 {
+      background: #faf5ff;
+      border: 1px solid #d8b4fe;
+      color: #7c3aed;
+    }
+    .badge-ddr4 {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1d4ed8;
+    }
+    .badge-ddr4-5 {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      color: #0f766e;
+    }
+    .badge-ddr3 {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+
+    /* Windows 11 Badge */
+    .w11-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-width: 42px;
+      justify-content: center;
+    }
+    .w11-supported {
+      background: #ecfdf5;
+      border: 1px solid #86efac;
+      color: #15803d;
+    }
+    .w11-unsupported {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+    }
+
+    /* Right Bars Column */
+    .row-bars {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      padding: 2px 0;
+    }
+
+    /* Vertical Background Grid Lines */
+    .row-grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+    .grid-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: #f1f5f9;
+    }
+    .row-reference .grid-line {
+      background: rgba(202, 138, 4, 0.15);
+    }
+
+    /* Single Bar Line */
+    .bar-line {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 15px;
+      z-index: 1;
+      cursor: help;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.2s ease-out;
+      flex-shrink: 0;
+    }
+    .bar-fill.bar-passmark {
+      background: #2563eb;
+    }
+    .bar-fill.bar-gb6m {
+      background: #7c3aed;
+    }
+    .bar-fill.bar-gb6s {
+      background: #059669;
+    }
+    .bar-val {
+      font-size: 0.74rem;
+      font-weight: 600;
+      margin-left: 6px;
+      white-space: nowrap;
+      color: #475569;
+    }
+    .row-reference .bar-val {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Empty state */
+    .no-results {
+      padding: 30px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
 
   <h1>CPU Performance Comparison (Mini PCs and Laptops)</h1>
-  <p class="subtitle">Check or uncheck models directly in the histogram, then click <strong>Apply &amp; View</strong> to isolate them (or <strong>Edit Selection</strong> to show all rows again). Reference CPU is highlighted in yellow and always kept visible. Badges indicate RAM support (<span style="color: #1d4ed8; font-weight: 700;">DDR4</span>, <span style="color: #7c3aed; font-weight: 700;">DDR5</span>, <span style="color: #0f766e; font-weight: 700;">DDR4/5</span>) and Windows 11 compatibility (<span style="color: #16a34a; font-weight: 700;">✓ W11</span> / <span style="color: #dc2626; font-weight: 700;">✗ W11</span>).</p>
+  <p class="subtitle">Check or uncheck models directly in the histogram, then click <strong>Apply &amp; View</strong> to isolate them (or <strong>Edit Selection</strong> to show all rows again). Multiple Reference CPUs can be pinned (highlighted in yellow, kept visible across all filters). Badges indicate RAM support (<span style="color: #1d4ed8; font-weight: 700;">DDR4</span>, <span style="color: #7c3aed; font-weight: 700;">DDR5</span>, <span style="color: #0f766e; font-weight: 700;">DDR4/5</span>) and Windows 11 compatibility (<span style="color: #16a34a; font-weight: 700;">✓ W11</span> / <span style="color: #dc2626; font-weight: 700;">✗ W11</span>).</p>
 
   <div class="toolbar">
-    <div class="toolbar-group">
-      <label for="refSelect">Reference CPU:</label>
-      <select id="refSelect" class="ref-select" onchange="changeReferenceCpu(this.value)"></select>
-    </div>
+    <div class="toolbar-left">
+      <div class="toolbar-group">
+        <label for="sortSelect">Sort by:</label>
+        <select id="sortSelect" onchange="renderHistogram()">
+          <option value="gb6Single-asc" selected>Geekbench 6 Single (Ascending)</option>
+          <option value="gb6Single-desc">Geekbench 6 Single (Descending)</option>
+          <option value="passmark-asc">PassMark Multi (Ascending)</option>
+          <option value="passmark-desc">PassMark Multi (Descending)</option>
+          <option value="gb6Multi-asc">Geekbench 6 Multi (Ascending)</option>
+          <option value="gb6Multi-desc">Geekbench 6 Multi (Descending)</option>
+          <option value="name-asc">Processor Name (A to Z)</option>
+          <option value="name-desc">Processor Name (Z to A)</option>
+        </select>
+      </div>
 
-    <div class="toolbar-group">
-      <label for="sortSelect">Sort by:</label>
-      <select id="sortSelect" onchange="updateChart()">
-        <option value="gb6Single-asc" selected>Geekbench 6 Single (Ascending)</option>
-        <option value="gb6Single-desc">Geekbench 6 Single (Descending)</option>
-        <option value="passmark-asc">PassMark Multi (Ascending)</option>
-        <option value="passmark-desc">PassMark Multi (Descending)</option>
-        <option value="gb6Multi-asc">Geekbench 6 Multi (Ascending)</option>
-        <option value="gb6Multi-desc">Geekbench 6 Multi (Descending)</option>
-        <option value="name-asc">Processor Name (A to Z)</option>
-        <option value="name-desc">Processor Name (Z to A)</option>
-      </select>
-    </div>
-
-    <div class="toolbar-group">
-      <label for="win11Select">Windows 11:</label>
-      <select id="win11Select" onchange="updateChart()">
-        <option value="all">All CPUs</option>
-        <option value="supported">Supported only (✓ W11)</option>
-        <option value="unsupported">Unsupported only (✗ W11)</option>
-      </select>
-    </div>
-
-    <div class="toolbar-group">
-      <label for="ramSelect">RAM Support:</label>
-      <select id="ramSelect" onchange="updateChart()">
-        <option value="all">All RAM Types</option>
-        <option value="ddr5">Supports DDR5 (DDR5 / LPDDR5)</option>
-        <option value="ddr4">Supports DDR4 (DDR4 / LPDDR4)</option>
-        <option value="ddr5-only">DDR5 only</option>
-        <option value="ddr4-only">DDR4 only</option>
-        <option value="ddr3">DDR3 only</option>
-      </select>
+      <div class="toolbar-group">
+        <label>Reference CPUs:</label>
+        <div class="ref-chips-container" id="refChipsContainer"></div>
+        <select id="addRefSelect" class="add-ref-select" onchange="handleAddReferenceCpu(this.value)">
+          <option value="" disabled selected>+ Add Reference CPU...</option>
+        </select>
+      </div>
     </div>
 
     <div class="badge-info" id="countInfo"></div>
@@ -470,14 +724,14 @@
     <div class="selection-bar-left">
       <span class="selection-bar-title">Selection:</span>
       <button type="button" class="sel-btn" onclick="selectAllCpus()">Select All</button>
-      <button type="button" class="sel-btn" onclick="deselectAllCpus()">Deselect All (Keep Ref)</button>
+      <button type="button" class="sel-btn" onclick="deselectAllCpus()">Deselect All (Keep Refs)</button>
       <button type="button" class="sel-btn" id="btnSelW11" onclick="toggleSelectionFilter('w11')" title="Toggle Windows 11 filter (can be combined with RAM filters)">✓ W11 only</button>
       <button type="button" class="sel-btn" id="btnSelDdr4" onclick="toggleSelectionFilter('ddr4')" title="Toggle DDR4 filter (can be combined with W11 only)">DDR4</button>
       <button type="button" class="sel-btn" id="btnSelDdr5" onclick="toggleSelectionFilter('ddr5')" title="Toggle DDR5 filter (can be combined with W11 only)">DDR5</button>
 
       <div class="selection-search-group">
         <label for="filterInput" class="selection-search-label">Filter:</label>
-        <input type="text" id="filterInput" class="selection-search-input" placeholder="Search by name..." oninput="updateChart()">
+        <input type="text" id="filterInput" class="selection-search-input" placeholder="Search by name..." oninput="renderHistogram()">
         <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
       </div>
 
@@ -490,8 +744,19 @@
     </div>
   </div>
 
-  <div class="chart-container" id="chartBox">
-    <canvas id="cpuChart"></canvas>
+  <!-- Pure HTML/CSS Histogram Card -->
+  <div class="histogram-card" id="histogramCard">
+    <div class="hist-header">
+      <div class="hist-header-left">
+        <span>Processor &amp; Badges</span>
+      </div>
+      <div class="hist-header-right" id="scaleHeaderRight">
+        <!-- Scale ticks generated dynamically -->
+      </div>
+    </div>
+    <div class="hist-rows" id="histRows">
+      <!-- Generated dynamically -->
+    </div>
   </div>
 
   <script>
@@ -515,6 +780,7 @@
       { name: "AMD Ryzen 3 3300U", passmark: 5600, gb6Multi: 2500, gb6Single: 970, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2400 (Dual Channel)" },
       { name: "Intel Processor N97", passmark: 5900, gb6Multi: 3050, gb6Single: 1200, win11: true, ram: ["DDR4", "DDR5"], ramDesc: "DDR4-3200 / DDR5-4800 (Single Channel)" },
       { name: "Intel Core i5-8250U", passmark: 5900, gb6Multi: 3100, gb6Single: 980, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2400 / LPDDR3-2133 (Dual Channel)" },
+      { name: "Intel Core i5-7500", passmark: 6050, gb6Multi: 2850, gb6Single: 1150, win11: false, ram: ["DDR4"], ramDesc: "DDR4-2400 / DDR3L-1600 (Dual Channel)" },
       { name: "Intel Core i5-8350U", passmark: 6100, gb6Multi: 3400, gb6Single: 1100, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2400 / LPDDR3-2133 (Dual Channel)" },
       { name: "Intel Core i7-8565U", passmark: 6300, gb6Multi: 3500, gb6Single: 1150, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2400 / LPDDR3-2133 (Dual Channel)" },
       { name: "AMD Ryzen Embedded R2514", passmark: 6420, gb6Multi: 3000, gb6Single: 1000, win11: true, ram: ["DDR4"], ramDesc: "DDR4-2666 / DDR4-3200 (Dual Channel, ECC)" },
@@ -559,59 +825,90 @@
       { name: "Intel Core Ultra X9 388H", passmark: 37000, gb6Multi: 17000, gb6Single: 3000, win11: true, ram: ["DDR5"], ramDesc: "DDR5 / LPDDR5x (Dual Channel)" }
     ];
 
-    // Reference CPU (Intel N150 by default, can be modified via UI)
-    let currentRefName = "Intel Processor N150";
+    // Reference CPUs: default to Intel Processor N150 and Intel Core i5-1345U
+    let referenceCpuNames = new Set(["Intel Processor N150", "Intel Core i5-1345U"]);
 
-    // Set of checked CPU names (all checked by default)
+    // Set of checked CPU names (all checked by default, references always included)
     let checkedCpuNames = new Set(cpuData.map(c => c.name));
 
     // Isolated view mode: false = show all rows with checked/dimmed states; true = isolate checked rows only
     let viewOnlyChecked = false;
 
-    let chart = null;
-
-    function isRefLabel(label) {
-      return typeof label === "string" && label.includes(currentRefName);
-    }
-
-    function initReferenceDropdown() {
-      const select = document.getElementById("refSelect");
-      select.innerHTML = "";
-      const sortedCpus = [...cpuData].sort((a, b) => a.name.localeCompare(b.name));
-      sortedCpus.forEach(cpu => {
-        const opt = document.createElement("option");
-        opt.value = cpu.name;
-        const ramStr = cpu.ram ? cpu.ram.join("/") : "";
-        opt.textContent = `${cpu.name}  [${cpu.win11 ? "✓ W11" : "✗ W11"} | ${ramStr}]`;
-        if (cpu.name === currentRefName) {
-          opt.selected = true;
-        }
-        select.appendChild(opt);
-      });
-    }
-
-    function changeReferenceCpu(newRefName) {
-      currentRefName = newRefName;
-      // Reference CPU is always checked
-      checkedCpuNames.add(currentRefName);
-      updateChart();
-    }
-
-    function clearFilter() {
-      document.getElementById("filterInput").value = "";
-      if (document.getElementById("win11Select")) {
-        document.getElementById("win11Select").value = "all";
-      }
-      if (document.getElementById("ramSelect")) {
-        document.getElementById("ramSelect").value = "all";
-      }
-      updateChart();
-    }
-
     // Active selection filter toggle states
     let selFilterW11 = false;
     let selFilterDdr4 = false;
     let selFilterDdr5 = false;
+
+    function isReference(cpuName) {
+      return referenceCpuNames.has(cpuName);
+    }
+
+    function toggleReferenceCpu(cpuName) {
+      if (referenceCpuNames.has(cpuName)) {
+        if (referenceCpuNames.size <= 1) {
+          alert("At least one Reference CPU must remain selected.");
+          return;
+        }
+        referenceCpuNames.delete(cpuName);
+      } else {
+        referenceCpuNames.add(cpuName);
+        checkedCpuNames.add(cpuName);
+      }
+      updateReferenceUI();
+      renderHistogram();
+    }
+
+    function removeReferenceCpu(cpuName) {
+      if (referenceCpuNames.size <= 1) {
+        alert("At least one Reference CPU must remain selected.");
+        return;
+      }
+      referenceCpuNames.delete(cpuName);
+      updateReferenceUI();
+      renderHistogram();
+    }
+
+    function handleAddReferenceCpu(cpuName) {
+      if (!cpuName) return;
+      referenceCpuNames.add(cpuName);
+      checkedCpuNames.add(cpuName);
+      updateReferenceUI();
+      renderHistogram();
+    }
+
+    function updateReferenceUI() {
+      const container = document.getElementById("refChipsContainer");
+      container.innerHTML = "";
+
+      referenceCpuNames.forEach(name => {
+        const chip = document.createElement("span");
+        chip.className = "ref-chip";
+        chip.innerHTML = `
+          <span class="ref-chip-star">★</span>
+          <span>${name}</span>
+          <button type="button" class="ref-chip-close" onclick="removeReferenceCpu('${name.replace(/'/g, "\\'")}')" title="Remove as reference">✕</button>
+        `;
+        container.appendChild(chip);
+      });
+
+      const addSelect = document.getElementById("addRefSelect");
+      addSelect.innerHTML = `<option value="" disabled selected>+ Add Reference CPU...</option>`;
+      const availableCpus = [...cpuData]
+        .filter(c => !referenceCpuNames.has(c.name))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      availableCpus.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.name;
+        opt.textContent = c.name;
+        addSelect.appendChild(opt);
+      });
+    }
+
+    function clearFilter() {
+      document.getElementById("filterInput").value = "";
+      renderHistogram();
+    }
 
     function selectAllCpus() {
       selFilterW11 = false;
@@ -620,7 +917,7 @@
       updateSelectionFilterButtons();
       checkedCpuNames = new Set(cpuData.map(c => c.name));
       viewOnlyChecked = false;
-      updateChart();
+      renderHistogram();
     }
 
     function deselectAllCpus() {
@@ -628,9 +925,10 @@
       selFilterDdr4 = false;
       selFilterDdr5 = false;
       updateSelectionFilterButtons();
-      checkedCpuNames = new Set([currentRefName]);
+      // Keep all Reference CPUs selected
+      checkedCpuNames = new Set(referenceCpuNames);
       viewOnlyChecked = false;
-      updateChart();
+      renderHistogram();
     }
 
     function toggleSelectionFilter(type) {
@@ -647,28 +945,19 @@
       const btnDdr4 = document.getElementById("btnSelDdr4");
       const btnDdr5 = document.getElementById("btnSelDdr5");
 
-      if (btnW11) {
-        btnW11.classList.toggle("active-w11", selFilterW11);
-      }
-      if (btnDdr4) {
-        btnDdr4.classList.toggle("active-ddr4", selFilterDdr4);
-      }
-      if (btnDdr5) {
-        btnDdr5.classList.toggle("active-ddr5", selFilterDdr5);
-      }
+      if (btnW11) btnW11.classList.toggle("active-w11", selFilterW11);
+      if (btnDdr4) btnDdr4.classList.toggle("active-ddr4", selFilterDdr4);
+      if (btnDdr5) btnDdr5.classList.toggle("active-ddr5", selFilterDdr5);
     }
 
     function applySelectionFilters() {
-      // If no filter is toggled, restore all CPUs
       if (!selFilterW11 && !selFilterDdr4 && !selFilterDdr5) {
         checkedCpuNames = new Set(cpuData.map(c => c.name));
       } else {
-        checkedCpuNames = new Set([currentRefName]);
+        checkedCpuNames = new Set(referenceCpuNames);
         cpuData.forEach(cpu => {
-          // If W11 filter is active, require win11 support
           if (selFilterW11 && !cpu.win11) return;
 
-          // If either DDR4 or DDR5 filter is active, require matching RAM support
           if (selFilterDdr4 || selFilterDdr5) {
             const hasDdr4 = cpu.ram && cpu.ram.includes("DDR4");
             const hasDdr5 = cpu.ram && cpu.ram.includes("DDR5");
@@ -683,75 +972,28 @@
       }
 
       viewOnlyChecked = false;
-      updateChart();
+      renderHistogram();
     }
 
     function toggleViewOnlyChecked() {
       viewOnlyChecked = !viewOnlyChecked;
-      updateChart();
+      renderHistogram();
     }
 
-    function updateSelectionBarUI(visibleCount, totalCount) {
-      const counter = document.getElementById("selectionCounter");
-      const applyBtn = document.getElementById("applyViewBtn");
-      const checkedCount = checkedCpuNames.size;
-      const otherCount = Math.max(0, checkedCount - 1);
+    function toggleRowCheck(cpuName, event) {
+      if (referenceCpuNames.has(cpuName)) return;
 
-      if (viewOnlyChecked) {
-        counter.textContent = `Showing ${visibleCount} selected models (+ Reference ${currentRefName})`;
-        applyBtn.innerHTML = "✏️ Edit Selection (Show All Rows)";
-        applyBtn.className = "apply-view-btn btn-mode-edit";
-        applyBtn.title = "Display all rows to check or uncheck models";
+      if (event && event.altKey) {
+        // Alt+Click isolates this CPU with all Reference CPUs
+        checkedCpuNames = new Set([...referenceCpuNames, cpuName]);
       } else {
-        counter.textContent = `${checkedCount} of ${totalCount} models checked (${otherCount} custom + Reference)`;
-        applyBtn.innerHTML = `👁️ Apply &amp; View (${checkedCount})`;
-        applyBtn.className = "apply-view-btn";
-        applyBtn.title = "Isolate and show only checked models on the chart";
-      }
-    }
-
-    function getFilteredAndSortedData() {
-      const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
-      const win11Filter = document.getElementById("win11Select") ? document.getElementById("win11Select").value : "all";
-      const ramFilter = document.getElementById("ramSelect") ? document.getElementById("ramSelect").value : "all";
-
-      let result = cpuData.filter(item => {
-        // The current reference CPU is permanently kept visible
-        if (item.name === currentRefName) return true;
-
-        // In isolated view mode, only show checked CPUs
-        if (viewOnlyChecked && !checkedCpuNames.has(item.name)) return false;
-
-        // Check Windows 11 compatibility filter
-        if (win11Filter === "supported" && !item.win11) return false;
-        if (win11Filter === "unsupported" && item.win11) return false;
-
-        // Check RAM support filter
-        if (ramFilter === "ddr5" && (!item.ram || !item.ram.includes("DDR5"))) return false;
-        if (ramFilter === "ddr4" && (!item.ram || !item.ram.includes("DDR4"))) return false;
-        if (ramFilter === "ddr5-only" && !(item.ram && item.ram.includes("DDR5") && !item.ram.includes("DDR4") && !item.ram.includes("DDR3"))) return false;
-        if (ramFilter === "ddr4-only" && !(item.ram && item.ram.includes("DDR4") && !item.ram.includes("DDR5") && !item.ram.includes("DDR3"))) return false;
-        if (ramFilter === "ddr3" && (!item.ram || !item.ram.includes("DDR3"))) return false;
-
-        // Check if matches text filter
-        if (!filterText) return true;
-        return item.name.toLowerCase().includes(filterText);
-      });
-
-      // Sort
-      const sortVal = document.getElementById("sortSelect").value;
-      const [key, order] = sortVal.split("-");
-
-      result.sort((a, b) => {
-        const valA = a[key];
-        const valB = b[key];
-        if (typeof valA === "string") {
-          return order === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        if (checkedCpuNames.has(cpuName)) {
+          checkedCpuNames.delete(cpuName);
+        } else {
+          checkedCpuNames.add(cpuName);
         }
-        return order === "asc" ? valA - valB : valB - valA;
-      });
-
-      return result;
+      }
+      renderHistogram();
     }
 
     function handleCheckboxChange() {
@@ -759,12 +1001,10 @@
       const chkM = document.getElementById("chk-gb6Multi");
       const chkS = document.getElementById("chk-gb6Single");
 
-      // Ensure at least one benchmark stays checked
       if (!chkP.checked && !chkM.checked && !chkS.checked) {
         chkP.checked = true;
       }
-
-      updateChart();
+      renderHistogram();
     }
 
     function handleRadioClick(metricKey) {
@@ -773,17 +1013,14 @@
       const chkS = document.getElementById("chk-gb6Single");
       const sortSelect = document.getElementById("sortSelect");
 
-      // Isolate selected benchmark metric
       chkP.checked = (metricKey === "passmark");
       chkM.checked = (metricKey === "gb6Multi");
       chkS.checked = (metricKey === "gb6Single");
 
-      // Automatically apply ascending sort on the selected benchmark
       if (sortSelect) {
         sortSelect.value = metricKey + "-asc";
       }
-
-      updateChart();
+      renderHistogram();
     }
 
     function toggleMetricSort(metricKey) {
@@ -794,7 +1031,7 @@
       } else {
         sortSelect.value = metricKey + "-asc";
       }
-      updateChart();
+      renderHistogram();
     }
 
     function updateSortKeyIndicators(sortKey, sortOrder) {
@@ -819,587 +1056,310 @@
       });
     }
 
-    // Custom Chart.js plugin to draw a fluorescent yellow background behind Reference row and label
-    const highlightRefPlugin = {
-      id: "highlightRefPlugin",
-      beforeDraw(chartInstance) {
-        const yScale = chartInstance.scales.y;
-        const xScale = chartInstance.scales.x;
-        const currentLabels = chartInstance.data.labels;
-        if (!currentLabels || currentLabels.length === 0) return;
+    function getFilteredAndSortedData() {
+      const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
 
-        const refIndex = currentLabels.findIndex(l => isRefLabel(l));
-        if (refIndex === -1) return;
+      let result = cpuData.filter(item => {
+        // Reference CPUs are PERMANENTLY kept visible
+        if (referenceCpuNames.has(item.name)) return true;
 
-        const yCenter = yScale.getPixelForValue(refIndex);
-        const rowHeight = yScale.height / currentLabels.length;
-        const top = yCenter - rowHeight / 2;
-        const ctx = chartInstance.ctx;
+        // In isolated view mode, only show checked CPUs
+        if (viewOnlyChecked && !checkedCpuNames.has(item.name)) return false;
 
-        ctx.save();
-        // Fluorescent yellow band behind bars
-        ctx.fillStyle = "rgba(254, 240, 138, 0.40)";
-        ctx.fillRect(xScale.left, top + 1, xScale.width, rowHeight - 2);
+        // Text filter
+        if (filterText && !item.name.toLowerCase().includes(filterText)) return false;
 
-        // Fluorescent yellow badge behind the Y-axis label on the left
-        ctx.fillStyle = "#fef08a";
-        const labelAreaWidth = xScale.left - 8;
-        if (ctx.roundRect) {
-          ctx.beginPath();
-          ctx.roundRect(4, top + 3, labelAreaWidth, rowHeight - 6, 4);
-          ctx.fill();
-        } else {
-          ctx.fillRect(4, top + 3, labelAreaWidth, rowHeight - 6);
+        return true;
+      });
+
+      // Sort
+      const sortVal = document.getElementById("sortSelect").value;
+      const [key, order] = sortVal.split("-");
+
+      result.sort((a, b) => {
+        const valA = a[key];
+        const valB = b[key];
+        if (typeof valA === "string") {
+          return order === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
         }
+        return order === "asc" ? valA - valB : valB - valA;
+      });
 
-        ctx.restore();
-      }
-    };
+      return result;
+    }
 
-    // Custom Chart.js plugin to draw RAM badges, Windows 11 badges (green check / red cross), and row checkboxes
-    const rowCheckboxesPlugin = {
-      id: "rowCheckboxesPlugin",
-      afterDraw(chartInstance) {
-        const yScale = chartInstance.scales.y;
-        const xScale = chartInstance.scales.x;
-        const currentLabels = chartInstance.data.labels;
-        if (!currentLabels || currentLabels.length === 0) return;
+    function getRamBadgeClass(ramArr) {
+      const hasDdr5 = ramArr && ramArr.includes("DDR5");
+      const hasDdr4 = ramArr && ramArr.includes("DDR4");
+      const hasDdr3 = ramArr && ramArr.includes("DDR3");
 
-        const ctx = chartInstance.ctx;
-        const activeData = getFilteredAndSortedData();
+      if (hasDdr4 && hasDdr5) return { cls: "badge-ddr4-5", text: "DDR4/5" };
+      if (hasDdr5) return { cls: "badge-ddr5", text: "DDR5" };
+      if (hasDdr4) return { cls: "badge-ddr4", text: "DDR4" };
+      if (hasDdr3) return { cls: "badge-ddr3", text: "DDR3" };
+      return { cls: "badge-ddr4", text: "DDR4" };
+    }
 
-        for (let i = 0; i < currentLabels.length; i++) {
-          const yCenter = yScale.getPixelForValue(i);
-          const item = activeData[i];
-          if (!item) continue;
-          const isRef = item.name === currentRefName;
-
-          ctx.save();
-
-          // 1. Draw RAM badge (DDR4, DDR5, DDR4/5, DDR3)
-          const ramX = xScale.left - 124;
-          const ramY = Math.round(yCenter - 8);
-          const ramW = 51;
-          const ramH = 16;
-
-          ctx.beginPath();
-          if (ctx.roundRect) {
-            ctx.roundRect(ramX, ramY, ramW, ramH, 3);
-          } else {
-            ctx.rect(ramX, ramY, ramW, ramH);
-          }
-
-          let ramBadgeText = "DDR4";
-          let ramBg = "#eff6ff";
-          let ramBorder = "#93c5fd";
-          let ramFg = "#1d4ed8";
-
-          const hasDdr5 = item.ram && item.ram.includes("DDR5");
-          const hasDdr4 = item.ram && item.ram.includes("DDR4");
-          const hasDdr3 = item.ram && item.ram.includes("DDR3");
-
-          if (hasDdr4 && hasDdr5) {
-            ramBadgeText = "DDR4/5";
-            ramBg = "#f0fdfa";
-            ramBorder = "#99f6e4";
-            ramFg = "#0f766e";
-          } else if (hasDdr5) {
-            ramBadgeText = "DDR5";
-            ramBg = "#faf5ff";
-            ramBorder = "#d8b4fe";
-            ramFg = "#7c3aed";
-          } else if (hasDdr4) {
-            ramBadgeText = "DDR4";
-            ramBg = "#eff6ff";
-            ramBorder = "#93c5fd";
-            ramFg = "#1d4ed8";
-          } else if (hasDdr3) {
-            ramBadgeText = "DDR3";
-            ramBg = "#f1f5f9";
-            ramBorder = "#cbd5e1";
-            ramFg = "#475569";
-          }
-
-          ctx.fillStyle = ramBg;
-          ctx.strokeStyle = ramBorder;
-          ctx.lineWidth = 1;
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = ramFg;
-          ctx.font = "700 9px sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(ramBadgeText, ramX + ramW / 2, yCenter);
-
-          // 2. Draw Windows 11 badge with green checkmark or red cross
-          const badgeX = xScale.left - 67;
-          const badgeY = Math.round(yCenter - 8);
-          const badgeW = 43;
-          const badgeH = 16;
-
-          ctx.beginPath();
-          if (ctx.roundRect) {
-            ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 3);
-          } else {
-            ctx.rect(badgeX, badgeY, badgeW, badgeH);
-          }
-
-          ctx.textBaseline = "middle";
-          ctx.textAlign = "left";
-
-          if (item.win11) {
-            // Supported: soft green background, border, and vivid green checkmark
-            ctx.fillStyle = "#ecfdf5";
-            ctx.strokeStyle = "#86efac";
-            ctx.lineWidth = 1;
-            ctx.fill();
-            ctx.stroke();
-
-            // Green checkmark
-            ctx.fillStyle = "#16a34a";
-            ctx.font = "bold 11px sans-serif";
-            ctx.fillText("✓", badgeX + 4.5, yCenter);
-
-            // Dark green text
-            ctx.fillStyle = "#15803d";
-            ctx.font = "700 9px sans-serif";
-            ctx.fillText("W11", badgeX + 16, yCenter);
-          } else {
-            // Unsupported: soft red background, border, and vivid red cross
-            ctx.fillStyle = "#fef2f2";
-            ctx.strokeStyle = "#fca5a5";
-            ctx.lineWidth = 1;
-            ctx.fill();
-            ctx.stroke();
-
-            // Red cross
-            ctx.fillStyle = "#dc2626";
-            ctx.font = "bold 11px sans-serif";
-            ctx.fillText("✗", badgeX + 4.5, yCenter);
-
-            // Dark red text
-            ctx.fillStyle = "#b91c1c";
-            ctx.font = "700 9px sans-serif";
-            ctx.fillText("W11", badgeX + 16, yCenter);
-          }
-
-          // 2. Draw Checkbox: to the right of W11 badge, left of the histogram bars
-          const cbX = xScale.left - 18;
-          const cbY = Math.round(yCenter - 7);
-          const cbSize = 14;
-
-          if (isRef) {
-            // Reference CPU checkbox: golden yellow, locked
-            ctx.fillStyle = "#fef08a";
-            ctx.strokeStyle = "#ca8a04";
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            if (ctx.roundRect) {
-              ctx.roundRect(cbX, cbY, cbSize, cbSize, 3);
-            } else {
-              ctx.rect(cbX, cbY, cbSize, cbSize);
-            }
-            ctx.fill();
-            ctx.stroke();
-
-            // Checkmark in dark gold
-            ctx.strokeStyle = "#854d0e";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(cbX + 3.5, cbY + 7);
-            ctx.lineTo(cbX + 6, cbY + 10);
-            ctx.lineTo(cbX + 10.5, cbY + 4);
-            ctx.stroke();
-          } else if (checkedCpuNames.has(item.name)) {
-            // Checked CPU checkbox: blue with white checkmark
-            ctx.fillStyle = "#0284c7";
-            ctx.strokeStyle = "#0284c7";
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            if (ctx.roundRect) {
-              ctx.roundRect(cbX, cbY, cbSize, cbSize, 3);
-            } else {
-              ctx.rect(cbX, cbY, cbSize, cbSize);
-            }
-            ctx.fill();
-            ctx.stroke();
-
-            // White checkmark
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 1.8;
-            ctx.beginPath();
-            ctx.moveTo(cbX + 3.5, cbY + 7);
-            ctx.lineTo(cbX + 6, cbY + 10);
-            ctx.lineTo(cbX + 10.5, cbY + 4);
-            ctx.stroke();
-          } else {
-            // Unchecked CPU checkbox: empty with neutral gray border
-            ctx.fillStyle = "#ffffff";
-            ctx.strokeStyle = "#94a3b8";
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            if (ctx.roundRect) {
-              ctx.roundRect(cbX, cbY, cbSize, cbSize, 3);
-            } else {
-              ctx.rect(cbX, cbY, cbSize, cbSize);
-            }
-            ctx.fill();
-            ctx.stroke();
-          }
-
-          ctx.restore();
-        }
-      }
-    };
-
-    // Custom Chart.js plugin to print benchmark score values at the end of each bar
-    const barValueLabelsPlugin = {
-      id: "barValueLabelsPlugin",
-      afterDatasetsDraw(chartInstance) {
-        const ctx = chartInstance.ctx;
-        ctx.save();
-        ctx.textBaseline = "middle";
-        const activeData = getFilteredAndSortedData();
-
-        chartInstance.data.datasets.forEach((dataset, datasetIdx) => {
-          const meta = chartInstance.getDatasetMeta(datasetIdx);
-          if (!meta || meta.hidden) return;
-
-          meta.data.forEach((bar, index) => {
-            const val = dataset.data[index];
-            if (val === undefined || val === null) return;
-
-            const item = activeData[index];
-            const isChecked = item ? (item.name === currentRefName || checkedCpuNames.has(item.name)) : true;
-            if (!isChecked && !viewOnlyChecked) {
-              ctx.fillStyle = "#94a3b8";
-              ctx.font = "500 10px sans-serif";
-            } else {
-              const isRef = chartInstance.data.labels[index] && isRefLabel(chartInstance.data.labels[index]);
-              ctx.fillStyle = isRef ? "#0f172a" : "#475569";
-              ctx.font = isRef ? "bold 11px sans-serif" : "600 10px sans-serif";
-            }
-
-            const formatted = val.toLocaleString("en-US");
-            ctx.fillText(formatted, bar.x + 5, bar.y);
-          });
-        });
-
-        ctx.restore();
-      }
-    };
-
-    function updateChart() {
+    function renderHistogram() {
       const activeData = getFilteredAndSortedData();
-      // Dynamically append (Ref) to current reference CPU (W11 badge is rendered in color via canvas plugin)
-      const labels = activeData.map(item => item.name === currentRefName ? item.name + " (Ref)" : item.name);
+      const totalCount = cpuData.length;
+      const visibleCount = activeData.length;
+      const checkedCount = checkedCpuNames.size;
+      const refCount = referenceCpuNames.size;
+      const customCount = Math.max(0, checkedCount - refCount);
 
-      // Read current sort selection
+      // Sort state
       const sortVal = document.getElementById("sortSelect").value;
       const [sortKey, sortOrder] = sortVal.split("-");
       updateSortKeyIndicators(sortKey, sortOrder);
 
-      // Update count info and button labels
-      const totalCount = cpuData.length;
-      const visibleCount = activeData.length;
-
+      // Toolbar count info
       document.getElementById("countInfo").textContent =
         visibleCount === totalCount
-          ? `Showing all ${totalCount} CPUs`
-          : `Showing ${visibleCount} of ${totalCount} CPUs (${currentRefName} pinned)`;
+          ? `Showing all ${totalCount} CPUs (${refCount} references pinned)`
+          : `Showing ${visibleCount} of ${totalCount} CPUs (${refCount} references pinned)`;
 
-      const ratioBadge = document.getElementById("visibleRatioBadge");
-      if (ratioBadge) {
-        ratioBadge.textContent = `${visibleCount}/${totalCount}`;
+      // Selection Bar UI
+      const counter = document.getElementById("selectionCounter");
+      const applyBtn = document.getElementById("applyViewBtn");
+      if (viewOnlyChecked) {
+        counter.textContent = `Showing ${visibleCount} selected models (${refCount} References included)`;
+        applyBtn.innerHTML = "✏️ Edit Selection (Show All Rows)";
+        applyBtn.className = "apply-view-btn btn-mode-edit";
+        applyBtn.title = "Display all rows to check or uncheck models";
+      } else {
+        counter.textContent = `${checkedCount} of ${totalCount} models checked (${customCount} custom + ${refCount} Reference)`;
+        applyBtn.innerHTML = `👁️ Apply &amp; View (${checkedCount})`;
+        applyBtn.className = "apply-view-btn";
+        applyBtn.title = "Isolate and show only checked models on the chart";
       }
 
-      // Update in-histogram selection bar UI
-      updateSelectionBarUI(visibleCount, totalCount);
-
-      // Read checkbox visibility
+      // Benchmark visibility
       const showPassmark = document.getElementById("chk-passmark").checked;
       const showGb6Multi = document.getElementById("chk-gb6Multi").checked;
       const showGb6Single = document.getElementById("chk-gb6Single").checked;
 
-      // Sync radio buttons: checked only when that single metric is exclusively active
+      // Sync radio buttons
       document.getElementById("radio-passmark").checked = (showPassmark && !showGb6Multi && !showGb6Single);
       document.getElementById("radio-gb6Multi").checked = (!showPassmark && showGb6Multi && !showGb6Single);
       document.getElementById("radio-gb6Single").checked = (!showPassmark && !showGb6Multi && showGb6Single);
 
-      // Count active datasets to dynamically calibrate row height
-      const activeDatasetsCount = (showPassmark ? 1 : 0) + (showGb6Multi ? 1 : 0) + (showGb6Single ? 1 : 0);
-      const rowStep = Math.max(30, activeDatasetsCount * 18 + 12);
-      const targetHeight = Math.max(300, visibleCount * rowStep + 26);
-      const chartBox = document.getElementById("chartBox");
-      chartBox.style.height = targetHeight + "px";
+      // Lookup Reference CPU objects for relative percentage calculations
+      const refObjects = cpuData.filter(c => referenceCpuNames.has(c.name));
 
-      const datasets = [];
+      // Calculate maximum score across visible rows and active metrics for scaling
+      let maxScore = 100;
+      activeData.forEach(item => {
+        if (showPassmark && item.passmark > maxScore) maxScore = item.passmark;
+        if (showGb6Multi && item.gb6Multi > maxScore) maxScore = item.gb6Multi;
+        if (showGb6Single && item.gb6Single > maxScore) maxScore = item.gb6Single;
+      });
 
-      if (showPassmark) {
-        datasets.push({
-          key: "passmark",
-          label: "PassMark CPU Mark (Multi-Thread)" + (sortKey === "passmark" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
-          data: activeData.map(item => item.passmark),
-          backgroundColor: activeData.map(item => {
-            const isChecked = item.name === currentRefName || checkedCpuNames.has(item.name);
-            return isChecked || viewOnlyChecked ? "#2563eb" : "rgba(37, 99, 235, 0.20)";
-          }),
-          borderRadius: 3
-        });
+      // Add headroom (12%)
+      const targetScaleMax = maxScore * 1.12;
+
+      // Determine nice round tick step
+      let tickStep = 5000;
+      if (targetScaleMax <= 4000) tickStep = 500;
+      else if (targetScaleMax <= 8000) tickStep = 1000;
+      else if (targetScaleMax <= 15000) tickStep = 2500;
+      else if (targetScaleMax <= 25000) tickStep = 5000;
+      else tickStep = 5000;
+
+      const scaleMax = Math.ceil(targetScaleMax / tickStep) * tickStep;
+      const tickCount = Math.floor(scaleMax / tickStep);
+
+      // Build Scale Header Ticks
+      const scaleHeader = document.getElementById("scaleHeaderRight");
+      scaleHeader.innerHTML = "";
+      const tickPositions = [];
+
+      for (let i = 0; i <= tickCount; i++) {
+        const val = i * tickStep;
+        const pct = (val / scaleMax) * 100;
+        tickPositions.push(pct);
+
+        const tickEl = document.createElement("span");
+        tickEl.className = "scale-tick";
+        tickEl.style.left = pct + "%";
+        tickEl.textContent = val >= 1000 ? (val / 1000).toLocaleString() + "k" : val.toLocaleString();
+        scaleHeader.appendChild(tickEl);
       }
 
-      if (showGb6Multi) {
-        datasets.push({
-          key: "gb6Multi",
-          label: "Geekbench 6 (Multi-Core)" + (sortKey === "gb6Multi" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
-          data: activeData.map(item => item.gb6Multi),
-          backgroundColor: activeData.map(item => {
-            const isChecked = item.name === currentRefName || checkedCpuNames.has(item.name);
-            return isChecked || viewOnlyChecked ? "#7c3aed" : "rgba(124, 58, 237, 0.20)";
-          }),
-          borderRadius: 3
-        });
+      // Render Rows
+      const rowsContainer = document.getElementById("histRows");
+      rowsContainer.innerHTML = "";
+
+      if (activeData.length === 0) {
+        rowsContainer.innerHTML = `<div class="no-results">No CPUs match your current search/filter criteria.</div>`;
+        return;
       }
 
-      if (showGb6Single) {
-        datasets.push({
-          key: "gb6Single",
-          label: "Geekbench 6 (Single-Core)" + (sortKey === "gb6Single" ? (sortOrder === "asc" ? " ▲" : " ▼") : ""),
-          data: activeData.map(item => item.gb6Single),
-          backgroundColor: activeData.map(item => {
-            const isChecked = item.name === currentRefName || checkedCpuNames.has(item.name);
-            return isChecked || viewOnlyChecked ? "#059669" : "rgba(5, 150, 105, 0.20)";
-          }),
-          borderRadius: 3
+      activeData.forEach(cpu => {
+        const isRef = referenceCpuNames.has(cpu.name);
+        const isChecked = isRef || checkedCpuNames.has(cpu.name);
+        const isDimmed = !isChecked && !viewOnlyChecked;
+
+        const row = document.createElement("div");
+        row.className = `hist-row ${isRef ? 'row-reference' : ''} ${isDimmed ? 'row-dimmed' : ''}`;
+
+        // Left Label Column
+        const labelArea = document.createElement("div");
+        labelArea.className = "row-label";
+
+        const chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.className = "row-chk";
+        chk.checked = isChecked;
+        if (isRef) {
+          chk.disabled = true;
+          chk.title = "Reference CPU is permanently selected";
+        } else {
+          chk.title = isChecked ? `Click to uncheck (Alt+Click to isolate)` : `Click to check`;
+          chk.addEventListener("click", function(e) {
+            e.stopPropagation();
+            toggleRowCheck(cpu.name, e);
+          });
+        }
+        labelArea.appendChild(chk);
+
+        // Pin / Star Button
+        const pinBtn = document.createElement("button");
+        pinBtn.type = "button";
+        pinBtn.className = `row-pin-btn ${isRef ? 'active' : ''}`;
+        pinBtn.innerHTML = isRef ? "★ Ref" : "☆ Ref";
+        pinBtn.title = isRef ? "Reference CPU (Click to remove from reference)" : "Click to pin as Reference CPU";
+        pinBtn.onclick = function(e) {
+          e.stopPropagation();
+          toggleReferenceCpu(cpu.name);
+        };
+        labelArea.appendChild(pinBtn);
+
+        // CPU Name
+        const nameEl = document.createElement("span");
+        nameEl.className = "row-name";
+        nameEl.title = cpu.name;
+        nameEl.innerHTML = `${cpu.name} ${isRef ? '<span class="ref-badge">★ Ref</span>' : ''}`;
+        labelArea.appendChild(nameEl);
+
+        // RAM Badge
+        const ramInfo = getRamBadgeClass(cpu.ram);
+        const ramBadge = document.createElement("span");
+        ramBadge.className = `ram-badge ${ramInfo.cls}`;
+        ramBadge.textContent = ramInfo.text;
+        ramBadge.title = `Supported RAM: ${cpu.ramDesc || (cpu.ram ? cpu.ram.join(', ') : 'N/A')}`;
+        labelArea.appendChild(ramBadge);
+
+        // Windows 11 Badge
+        const w11Badge = document.createElement("span");
+        w11Badge.className = `w11-badge ${cpu.win11 ? 'w11-supported' : 'w11-unsupported'}`;
+        w11Badge.innerHTML = cpu.win11 ? "✓ W11" : "✗ W11";
+        w11Badge.title = cpu.win11 ? "Windows 11: Officially supported by Microsoft" : "Windows 11: Not officially supported by Microsoft";
+        labelArea.appendChild(w11Badge);
+
+        row.appendChild(labelArea);
+
+        // Right Bars Column
+        const barsArea = document.createElement("div");
+        barsArea.className = "row-bars";
+
+        // Vertical Grid Overlay matching ticks
+        const gridOverlay = document.createElement("div");
+        gridOverlay.className = "row-grid-overlay";
+        tickPositions.forEach(pct => {
+          const gLine = document.createElement("div");
+          gLine.className = "grid-line";
+          gLine.style.left = pct + "%";
+          gridOverlay.appendChild(gLine);
         });
-      }
+        barsArea.appendChild(gridOverlay);
 
-      // Lookup current reference CPU object for relative percentage calculations
-      const currentRefObj = cpuData.find(item => item.name === currentRefName) || cpuData[0];
-
-      if (!chart) {
-        const ctx = document.getElementById("cpuChart").getContext("2d");
-        chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: labels,
-            datasets: datasets
-          },
-          plugins: [highlightRefPlugin, rowCheckboxesPlugin, barValueLabelsPlugin],
-          options: {
-            indexAxis: "y",
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-              padding: {
-                top: 0,
-                bottom: 2,
-                left: 0,
-                right: 8
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  afterLabel: function(context) {
-                    const currentVal = context.raw;
-                    const datasetKey = context.dataset.key;
-                    let refVal = currentRefObj.passmark;
-                    if (datasetKey === "gb6Multi") refVal = currentRefObj.gb6Multi;
-                    if (datasetKey === "gb6Single") refVal = currentRefObj.gb6Single;
-
-                    const label = context.chart.data.labels[context.dataIndex];
-                    const activeData = getFilteredAndSortedData();
-                    const currentItem = activeData[context.dataIndex];
-
-                    const lines = [];
-                    if (isRefLabel(label)) {
-                      lines.push(`Reference CPU (${currentRefName})`);
-                    } else {
-                      const diff = (((currentVal - refVal) / refVal) * 100).toFixed(1);
-                      lines.push((diff > 0 ? "+" : "") + diff + `% vs ${currentRefName}`);
-                    }
-
-                    if (currentItem) {
-                      lines.push(`Supported RAM: ${currentItem.ramDesc || (currentItem.ram ? currentItem.ram.join(", ") : "N/A")}`);
-                      lines.push(currentItem.win11
-                        ? "Windows 11: Officially supported by Microsoft"
-                        : "Windows 11: Not officially supported by Microsoft");
-                    }
-                    return lines;
-                  }
-                }
-              }
-            },
-            scales: {
-              x: {
-                beginAtZero: true,
-                grace: "8%",
-                grid: { color: "#e2e8f0" }
-              },
-              y: {
-                grid: { display: false },
-                afterFit: function(axis) {
-                  // Prevent Chart.js from adding vertical spacing from ticks.padding to chart top/bottom
-                  axis.paddingTop = 0;
-                  axis.paddingBottom = 0;
-                },
-                ticks: {
-                  padding: 132, // Leave room for RAM badge, colored W11 badge, and row checkbox
-                  color: function(context) {
-                    const currentLabels = context.chart ? context.chart.data.labels : labels;
-                    const label = currentLabels ? currentLabels[context.index] : null;
-                    if (isRefLabel(label)) return "#0f172a";
-                    const currentData = getFilteredAndSortedData();
-                    const item = currentData ? currentData[context.index] : null;
-                    if (item && !checkedCpuNames.has(item.name) && !viewOnlyChecked) {
-                      return "#94a3b8";
-                    }
-                    return "#334155";
-                  },
-                  font: function(context) {
-                    const currentLabels = context.chart ? context.chart.data.labels : labels;
-                    const label = currentLabels ? currentLabels[context.index] : null;
-                    if (isRefLabel(label)) {
-                      return { weight: "bold", size: 12.5 };
-                    }
-                    return { weight: "normal", size: 12 };
-                  }
-                }
-              }
-            }
+        // Compute tooltips with diffs vs all reference CPUs
+        function makeTooltip(metricName, score, metricKey) {
+          const lines = [`${cpu.name} - ${metricName}: ${score.toLocaleString()}`];
+          if (isRef) {
+            lines.push("★ Reference CPU baseline");
+          } else if (refObjects.length > 0) {
+            const diffs = refObjects.map(ref => {
+              const refScore = ref[metricKey];
+              const diffPct = (((score - refScore) / refScore) * 100).toFixed(1);
+              return `${diffPct > 0 ? "+" : ""}${diffPct}% vs ${ref.name}`;
+            });
+            lines.push(diffs.join(" | "));
           }
-        });
+          lines.push(`Supported RAM: ${cpu.ramDesc || (cpu.ram ? cpu.ram.join(', ') : 'N/A')}`);
+          lines.push(cpu.win11 ? "Windows 11: Supported" : "Windows 11: Unsupported");
+          return lines.join("\n");
+        }
 
-        // Setup interactive click handler on canvas checkboxes
-        const canvas = document.getElementById("cpuChart");
+        // PassMark Bar
+        if (showPassmark) {
+          const barLine = document.createElement("div");
+          barLine.className = "bar-line";
+          barLine.title = makeTooltip("PassMark CPU Mark", cpu.passmark, "passmark");
 
-        canvas.addEventListener("click", function(event) {
-          if (!chart) return;
-          const rect = canvas.getBoundingClientRect();
-          const mouseX = event.clientX - rect.left;
-          const mouseY = event.clientY - rect.top;
+          const pct = Math.min(100, Math.max(0.5, (cpu.passmark / scaleMax) * 100));
+          const fill = document.createElement("div");
+          fill.className = "bar-fill bar-passmark";
+          fill.style.width = pct + "%";
 
-          const xScale = chart.scales.x;
-          const yScale = chart.scales.y;
-          if (!xScale || !yScale) return;
+          const val = document.createElement("span");
+          val.className = "bar-val";
+          val.textContent = cpu.passmark.toLocaleString();
 
-          // Checkbox column hit zone: right of W11 badge, left of bars
-          const cbLeft = xScale.left - 22;
-          const cbRight = xScale.left - 2;
+          barLine.appendChild(fill);
+          barLine.appendChild(val);
+          barsArea.appendChild(barLine);
+        }
 
-          if (mouseX >= cbLeft && mouseX <= cbRight) {
-            const currentLabels = chart.data.labels;
-            const numRows = currentLabels.length;
-            const rowHeight = yScale.height / numRows;
+        // Geekbench 6 Multi Bar
+        if (showGb6Multi) {
+          const barLine = document.createElement("div");
+          barLine.className = "bar-line";
+          barLine.title = makeTooltip("Geekbench 6 Multi-Core", cpu.gb6Multi, "gb6Multi");
 
-            for (let i = 0; i < numRows; i++) {
-              const yCenter = yScale.getPixelForValue(i);
-              if (mouseY >= yCenter - rowHeight / 2 && mouseY <= yCenter + rowHeight / 2) {
-                const currentData = getFilteredAndSortedData();
-                const clickedItem = currentData[i];
-                if (!clickedItem) break;
+          const pct = Math.min(100, Math.max(0.5, (cpu.gb6Multi / scaleMax) * 100));
+          const fill = document.createElement("div");
+          fill.className = "bar-fill bar-gb6m";
+          fill.style.width = pct + "%";
 
-                // Reference CPU cannot be unchecked
-                if (clickedItem.name === currentRefName) break;
+          const val = document.createElement("span");
+          val.className = "bar-val";
+          val.textContent = cpu.gb6Multi.toLocaleString();
 
-                if (event.altKey) {
-                  // Alt+Click isolates this CPU with the reference CPU
-                  checkedCpuNames = new Set([currentRefName, clickedItem.name]);
-                } else {
-                  // Standard click: toggle check state for this CPU
-                  if (checkedCpuNames.has(clickedItem.name)) {
-                    checkedCpuNames.delete(clickedItem.name);
-                  } else {
-                    checkedCpuNames.add(clickedItem.name);
-                  }
-                }
-                updateChart();
-                break;
-              }
-            }
-          }
-        });
+          barLine.appendChild(fill);
+          barLine.appendChild(val);
+          barsArea.appendChild(barLine);
+        }
 
-        canvas.addEventListener("mousemove", function(event) {
-          if (!chart) return;
-          const rect = canvas.getBoundingClientRect();
-          const mouseX = event.clientX - rect.left;
-          const mouseY = event.clientY - rect.top;
+        // Geekbench 6 Single Bar
+        if (showGb6Single) {
+          const barLine = document.createElement("div");
+          barLine.className = "bar-line";
+          barLine.title = makeTooltip("Geekbench 6 Single-Core", cpu.gb6Single, "gb6Single");
 
-          const xScale = chart.scales.x;
-          const yScale = chart.scales.y;
-          if (!xScale || !yScale) return;
+          const pct = Math.min(100, Math.max(0.5, (cpu.gb6Single / scaleMax) * 100));
+          const fill = document.createElement("div");
+          fill.className = "bar-fill bar-gb6s";
+          fill.style.width = pct + "%";
 
-          const cbLeft = xScale.left - 22;
-          const cbRight = xScale.left - 2;
-          const w11Left = xScale.left - 67;
-          const w11Right = xScale.left - 24;
-          const ramLeft = xScale.left - 124;
-          const ramRight = xScale.left - 73;
+          const val = document.createElement("span");
+          val.className = "bar-val";
+          val.textContent = cpu.gb6Single.toLocaleString();
 
-          const currentLabels = chart.data.labels;
-          const numRows = currentLabels.length;
-          const rowHeight = yScale.height / numRows;
+          barLine.appendChild(fill);
+          barLine.appendChild(val);
+          barsArea.appendChild(barLine);
+        }
 
-          for (let i = 0; i < numRows; i++) {
-            const yCenter = yScale.getPixelForValue(i);
-            if (mouseY >= yCenter - rowHeight / 2 && mouseY <= yCenter + rowHeight / 2) {
-              const currentData = getFilteredAndSortedData();
-              const hoveredItem = currentData[i];
-              if (!hoveredItem) break;
-
-              // Hovering over the row checkbox
-              if (mouseX >= cbLeft && mouseX <= cbRight) {
-                if (hoveredItem.name !== currentRefName) {
-                  canvas.style.cursor = "pointer";
-                  const isChecked = checkedCpuNames.has(hoveredItem.name);
-                  canvas.title = isChecked
-                    ? `Click to uncheck ${hoveredItem.name} (Alt+Click to isolate)`
-                    : `Click to check ${hoveredItem.name}`;
-                } else {
-                  canvas.style.cursor = "default";
-                  canvas.title = "Reference CPU (permanently selected)";
-                }
-                return;
-              }
-
-              // Hovering over the Windows 11 badge
-              if (mouseX >= w11Left && mouseX <= w11Right) {
-                canvas.style.cursor = "help";
-                canvas.title = hoveredItem.win11
-                  ? "Windows 11: Officially supported by Microsoft"
-                  : "Windows 11: Not officially supported by Microsoft";
-                return;
-              }
-
-              // Hovering over the RAM badge
-              if (mouseX >= ramLeft && mouseX <= ramRight) {
-                canvas.style.cursor = "help";
-                canvas.title = `Supported RAM: ${hoveredItem.ramDesc || (hoveredItem.ram ? hoveredItem.ram.join(", ") : "N/A")}`;
-                return;
-              }
-            }
-          }
-          canvas.style.cursor = "default";
-          canvas.title = "";
-        });
-
-      } else {
-        chart.data.labels = labels;
-        chart.data.datasets = datasets;
-        chart.resize();
-        chart.update();
-      }
+        row.appendChild(barsArea);
+        rowsContainer.appendChild(row);
+      });
     }
 
-    // Initialize reference dropdown and chart on load
-    initReferenceDropdown();
-    updateChart();
+    // Initialize UI and render on load
+    updateReferenceUI();
+    renderHistogram();
   </script>
 </body>
 </html>
