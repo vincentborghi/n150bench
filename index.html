@@ -331,6 +331,33 @@
       color: #64748b;
       margin-left: 6px;
     }
+    .selection-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .reset-all-btn {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 6px 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .reset-all-btn:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+    .reset-all-btn:active {
+      transform: translateY(1px);
+    }
     .apply-view-btn {
       background: #0284c7;
       color: #ffffff;
@@ -951,6 +978,9 @@
       <span class="selection-counter" id="selectionCounter"></span>
     </div>
     <div class="selection-bar-right">
+      <button type="button" class="reset-all-btn" onclick="resetAllToDefault()" title="Reset all filters, sorting, references, and selection to initial default view">
+        🔄 Reset All
+      </button>
       <button type="button" class="apply-view-btn" id="applyViewBtn" onclick="toggleViewOnlyChecked()">
         👁️ Apply &amp; View
       </button>
@@ -1179,6 +1209,52 @@
       checkedCpuNames = new Set(referenceCpuNames);
       viewOnlyChecked = false;
       renderHistogram();
+    }
+
+    function resetAllToDefault() {
+      // 1. Reset Reference CPUs to initial defaults (Intel Processor N150 and Intel Core i5-1345U)
+      referenceCpuNames = new Set(["Intel Processor N150", "Intel Core i5-1345U"]);
+      updateReferenceUI();
+
+      // 2. Reset selection checkboxes (all CPUs checked)
+      checkedCpuNames = new Set(cpuData.map(c => c.name));
+      viewOnlyChecked = false;
+
+      // 3. Reset filter toggles (Brand, Power, Win11, RAM)
+      selFilterBrand = "all";
+      selFilterPower = "all";
+      selFilterW11 = false;
+      selFilterDdr4 = false;
+      selFilterDdr5 = false;
+      updateSelectionFilterButtons();
+
+      // 4. Reset text search filter
+      const filterInput = document.getElementById("filterInput");
+      if (filterInput) filterInput.value = "";
+
+      // 5. Reset match badge
+      activeMatchQuery = null;
+      activeMatchResult = null;
+      const matchBadge = document.getElementById("matchFilterBadge");
+      if (matchBadge) matchBadge.style.display = "none";
+
+      // 6. Reset sort to default (Geekbench 6 Single Ascending)
+      const sortSelect = document.getElementById("sortSelect");
+      if (sortSelect) sortSelect.value = "gb6Single-asc";
+
+      // 7. Reset benchmark checkboxes (all 3 metrics enabled)
+      const chkP = document.getElementById("chk-passmark");
+      const chkM = document.getElementById("chk-gb6Multi");
+      const chkS = document.getElementById("chk-gb6Single");
+      if (chkP) chkP.checked = true;
+      if (chkM) chkM.checked = true;
+      if (chkS) chkS.checked = true;
+
+      // 8. Re-render histogram
+      renderHistogram();
+
+      // 9. Feedback toast
+      showToast("🔄 View reset to initial defaults.", "info");
     }
 
     function toggleSelectionFilter(type) {
