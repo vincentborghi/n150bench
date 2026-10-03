@@ -399,6 +399,70 @@
       background: #e2e8f0;
     }
 
+    /* Match Filter Indicator in Selection Bar */
+    .match-filter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      background: #eff6ff;
+      border: 1px solid #3b82f6;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1e40af;
+      box-shadow: 0 1px 3px rgba(59, 130, 246, 0.2);
+      animation: toastFadeIn 0.2s ease-out;
+    }
+    .match-filter-badge .match-icon {
+      font-size: 0.95rem;
+    }
+    .match-filter-badge .match-label {
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+    .match-filter-badge .match-query {
+      background: #dbeafe;
+      color: #1e3a8a;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .match-filter-badge .match-arrow {
+      color: #60a5fa;
+      font-weight: 700;
+    }
+    .match-filter-badge .match-target {
+      color: #0369a1;
+      font-weight: 700;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .match-clear-btn {
+      background: #fee2e2;
+      border: 1px solid #f87171;
+      color: #991b1b;
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.74rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+      margin-left: 4px;
+    }
+    .match-clear-btn:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #dc2626;
+    }
+
     /* Pure HTML/CSS Histogram Container */
     .histogram-card {
       background: #ffffff;
@@ -874,6 +938,16 @@
         <button class="clear-btn" type="button" onclick="clearFilter()">Clear</button>
       </div>
 
+      <!-- Match Filter Indicator and Clear Button -->
+      <div class="match-filter-badge" id="matchFilterBadge" style="display: none;">
+        <span class="match-icon">📋</span>
+        <span class="match-label">Match:</span>
+        <span class="match-query" id="matchQueryDisplay" title="Original text from clipboard"></span>
+        <span class="match-arrow">➔</span>
+        <span class="match-target" id="matchTargetDisplay" title="Matched processor(s)"></span>
+        <button type="button" class="match-clear-btn" onclick="clearMatchFilter()" title="Clear match filter and restore view">✕ Clear Match</button>
+      </div>
+
       <span class="selection-counter" id="selectionCounter"></span>
     </div>
     <div class="selection-bar-right">
@@ -1048,12 +1122,41 @@
       });
     }
 
+    // Active match state
+    let activeMatchQuery = null;
+    let activeMatchResult = null;
+
+    function clearMatchFilter() {
+      activeMatchQuery = null;
+      activeMatchResult = null;
+
+      const badge = document.getElementById("matchFilterBadge");
+      if (badge) badge.style.display = "none";
+
+      const filterInput = document.getElementById("filterInput");
+      if (filterInput) filterInput.value = "";
+
+      checkedCpuNames = new Set(cpuData.map(c => c.name));
+      viewOnlyChecked = false;
+      renderHistogram();
+      showToast("Match filter cleared. All CPUs restored.", "info");
+    }
+
     function clearFilter() {
       document.getElementById("filterInput").value = "";
-      renderHistogram();
+      if (activeMatchQuery) {
+        clearMatchFilter();
+      } else {
+        renderHistogram();
+      }
     }
 
     function selectAllCpus() {
+      activeMatchQuery = null;
+      activeMatchResult = null;
+      const badge = document.getElementById("matchFilterBadge");
+      if (badge) badge.style.display = "none";
+
       selFilterBrand = "all";
       selFilterPower = "all";
       selFilterW11 = false;
@@ -1662,6 +1765,20 @@
       selFilterDdr4 = false;
       selFilterDdr5 = false;
       updateSelectionFilterButtons();
+
+      activeMatchQuery = text;
+      activeMatchResult = matchedNames;
+
+      // Update match indicator badge in filters area
+      const matchBadge = document.getElementById("matchFilterBadge");
+      const matchQueryDisplay = document.getElementById("matchQueryDisplay");
+      const matchTargetDisplay = document.getElementById("matchTargetDisplay");
+      if (matchBadge && matchQueryDisplay && matchTargetDisplay) {
+        matchQueryDisplay.textContent = `"${text.length > 25 ? text.slice(0, 22) + '...' : text}"`;
+        matchQueryDisplay.title = `Full text used for matching: "${text}"`;
+        matchTargetDisplay.textContent = matchedNames.map(n => n.replace(/^(Intel|AMD)\s+/, '')).join(', ');
+        matchBadge.style.display = "inline-flex";
+      }
 
       const filterInput = document.getElementById("filterInput");
       if (matchedNames.length === 1) {
