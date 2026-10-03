@@ -669,6 +669,81 @@
       color: #64748b;
       font-size: 0.95rem;
     }
+
+    /* Floating Clipboard Action Button */
+    .floating-clipboard-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: #0284c7;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4), 0 2px 6px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .floating-clipboard-btn:hover {
+      background: #0369a1;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.55), 0 3px 8px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+    .floating-clipboard-btn:active {
+      transform: translateY(0);
+    }
+    .floating-clipboard-btn .btn-icon {
+      font-size: 1.1rem;
+    }
+
+    /* Clipboard Feedback Toast */
+    .clipboard-toast {
+      position: fixed;
+      bottom: 78px;
+      right: 24px;
+      z-index: 1001;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: #1e293b;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 420px;
+      animation: toastFadeIn 0.2s ease-out;
+    }
+    .clipboard-toast.toast-warning {
+      background: #854d0e;
+      border-color: #ca8a04;
+    }
+    .clipboard-toast.toast-success {
+      background: #065f46;
+      border-color: #059669;
+    }
+    @keyframes toastFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rowGlow {
+      0% { box-shadow: 0 0 0 3px #38bdf8; background-color: #e0f2fe; }
+      50% { box-shadow: 0 0 0 4px #0284c7; background-color: #bae6fd; }
+      100% { box-shadow: none; }
+    }
+    .row-highlight-pulse {
+      animation: rowGlow 2.5s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -1240,6 +1315,7 @@
 
         const row = document.createElement("div");
         row.className = `hist-row ${isRef ? 'row-reference' : ''} ${isDimmed ? 'row-dimmed' : ''}`;
+        row.dataset.cpuName = cpu.name;
 
         // Left Label Column
         const labelArea = document.createElement("div");
@@ -1395,9 +1471,186 @@
       });
     }
 
+    // Toast Notification helper
+    let toastTimeout = null;
+    function showToast(message, type = "info") {
+      let toast = document.getElementById("clipboardToast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "clipboardToast";
+        toast.className = "clipboard-toast";
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.className = `clipboard-toast ${type === "warning" ? "toast-warning" : "toast-success"}`;
+      toast.style.display = "flex";
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.style.display = "none";
+      }, 4000);
+    }
+
+    // Heuristic scoring function for fuzzy matching CPU names against clipboard text
+    function scoreCpuMatch(cpu, clipText) {
+      const cName = cpu.name.toLowerCase();
+      const cNameClean = cName.replace(/[^a-z0-9]/g, "");
+      const clip = clipText.toLowerCase();
+      const clipClean = clip.replace(/[^a-z0-9]/g, "");
+
+      // 1. Direct exact or substring matches
+      if (clipClean === cNameClean) return 1000;
+      if (clip.includes(cName)) return 800;
+      if (cName.includes(clip) && clip.length >= 4) return 600 + clip.length * 10;
+      if (cNameClean.includes(clipClean) && clipClean.length >= 4) return 550 + clipClean.length * 10;
+
+      // 2. Tokenize
+      const clipWords = clip.split(/[\s,._\-\/\\()]+/).filter(w => w.length > 0);
+      const cpuWords = cName.split(/[\s,._\-\/\\()]+/).filter(w => w.length > 0);
+
+      // Model tokens (digits with suffix, e.g. 12450h, j3710, n100, 7735hs, 5700g, 155h)
+      const modelTokens = cpuWords.filter(w => /\d/.test(w) && w.length >= 3);
+      let score = 0;
+
+      for (const m of modelTokens) {
+        if (clipWords.includes(m)) {
+          score += 400;
+        } else if (clip.includes(m)) {
+          score += 300;
+        } else {
+          const numOnly = m.replace(/[^0-9]/g, "");
+          if (numOnly.length >= 3) {
+            if (clipWords.some(cw => cw.includes(numOnly))) {
+              score += 200;
+            } else if (clip.includes(numOnly)) {
+              score += 150;
+            }
+          }
+        }
+      }
+
+      // Word matches (brand, series, tiers)
+      for (const cw of cpuWords) {
+        if (cw === "intel" || cw === "amd") {
+          if (clipWords.includes(cw)) score += 30;
+        } else if (cw === "core" || cw === "ryzen" || cw === "processor" || cw === "celeron" || cw === "pentium") {
+          if (clipWords.includes(cw)) score += 40;
+        } else if (/^i[3579]$/.test(cw) || /^r[3579]$/.test(cw) || cw === "ultra") {
+          if (clipWords.includes(cw)) score += 60;
+        } else if (/^[3579]$/.test(cw)) {
+          if (clipWords.includes(cw)) score += 40;
+        } else if (!modelTokens.includes(cw)) {
+          if (clipWords.includes(cw)) score += 50;
+        }
+      }
+
+      // Brand mismatch penalty
+      if (cName.startsWith("intel") && clipWords.includes("amd")) score -= 150;
+      if (cName.startsWith("amd") && clipWords.includes("intel")) score -= 150;
+
+      // Tier mismatch penalty (e.g. user specified "i7" but this is "i5")
+      const clipTiers = clipWords.filter(w => /^i[3579]$/.test(w));
+      const cpuTiers = cpuWords.filter(w => /^i[3579]$/.test(w));
+      if (clipTiers.length > 0 && cpuTiers.length > 0 && clipTiers[0] !== cpuTiers[0]) {
+        score -= 100;
+      }
+
+      return Math.max(0, score);
+    }
+
+    function matchAndSelectCpuFromText(text) {
+      if (!text || !text.trim()) {
+        showToast("Clipboard text is empty.", "warning");
+        return;
+      }
+
+      const scored = cpuData
+        .map(cpu => ({ cpu, score: scoreCpuMatch(cpu, text) }))
+        .sort((a, b) => b.score - a.score);
+
+      const topScore = scored[0].score;
+      if (topScore <= 50) {
+        showToast(`No CPU found matching: "${text.slice(0, 32)}"`, "warning");
+        return;
+      }
+
+      let matchedCpus = [];
+      if (scored.length > 1 && scored[0].score > scored[1].score * 1.25) {
+        matchedCpus = [scored[0].cpu];
+      } else {
+        matchedCpus = scored
+          .filter(s => s.score >= topScore * 0.9 && s.score >= 150)
+          .map(s => s.cpu);
+      }
+
+      const matchedNames = matchedCpus.map(c => c.name);
+
+      // Select matched CPUs while preserving all Reference CPUs
+      checkedCpuNames = new Set([...referenceCpuNames, ...matchedNames]);
+
+      // Reset brand and hardware filter states to allow matched CPUs to display cleanly
+      selFilterBrand = "all";
+      selFilterW11 = false;
+      selFilterDdr4 = false;
+      selFilterDdr5 = false;
+      updateSelectionFilterButtons();
+
+      const filterInput = document.getElementById("filterInput");
+      if (matchedNames.length === 1) {
+        if (filterInput) filterInput.value = matchedNames[0];
+        viewOnlyChecked = false;
+      } else {
+        if (filterInput) filterInput.value = "";
+        viewOnlyChecked = true;
+      }
+
+      renderHistogram();
+
+      // Smooth scroll to the first matched CPU and highlight
+      setTimeout(() => {
+        const firstMatchName = matchedNames[0];
+        const rowEl = document.querySelector(`.hist-row[data-cpu-name="${firstMatchName}"]`);
+        if (rowEl) {
+          rowEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          rowEl.classList.add("row-highlight-pulse");
+          setTimeout(() => rowEl.classList.remove("row-highlight-pulse"), 2500);
+        }
+      }, 100);
+
+      const toastMessage = matchedNames.length === 1
+        ? `📋 Matched: ${matchedNames[0]}`
+        : `📋 Matched ${matchedNames.length} CPUs: ${matchedNames.map(n => n.replace(/^(Intel|AMD)\s+/, '')).join(', ')}`;
+      showToast(toastMessage, "success");
+    }
+
+    async function handleClipboardMatch() {
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.readText) {
+          throw new Error("Clipboard API not available");
+        }
+        const text = await navigator.clipboard.readText();
+        if (!text || !text.trim()) {
+          showToast("Clipboard is empty or contains no text.", "warning");
+          return;
+        }
+        matchAndSelectCpuFromText(text.trim());
+      } catch (err) {
+        const manualText = prompt("Could not read clipboard automatically. Paste CPU name or text here:");
+        if (manualText && manualText.trim()) {
+          matchAndSelectCpuFromText(manualText.trim());
+        }
+      }
+    }
+
     // Initialize UI and render on load
     updateReferenceUI();
     renderHistogram();
   </script>
+
+  <!-- Floating Clipboard Match Button (always visible on screen) -->
+  <button type="button" class="floating-clipboard-btn" id="floatingClipboardBtn" onclick="handleClipboardMatch()" title="Paste text from clipboard and match/filter CPU">
+    <span class="btn-icon">📋</span>
+    <span class="btn-text">Match from Clipboard</span>
+  </button>
 </body>
 </html>
