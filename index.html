@@ -244,7 +244,10 @@
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       position: relative;
-      transition: height 0.2s ease;
+    }
+    #cpuChart {
+      display: block;
+      width: 100%;
     }
 
     /* In-histogram Selection Bar */
@@ -1240,6 +1243,11 @@
               },
               y: {
                 grid: { display: false },
+                afterFit: function(axis) {
+                  // Prevent Chart.js from adding vertical spacing from ticks.padding to chart top/bottom
+                  axis.paddingTop = 0;
+                  axis.paddingBottom = 0;
+                },
                 ticks: {
                   padding: 132, // Leave room for RAM badge, colored W11 badge, and row checkbox
                   color: function(context) {
